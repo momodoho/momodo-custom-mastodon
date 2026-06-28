@@ -1,0 +1,6 @@
+# momodo: two themes (Mastodon / Bird UI). Light vs dark is handled by the
+# standard color-scheme toggle (Preferences → Appearance), not by separate
+# themes. The old 4 fixed themes (mastodon-dark, bird-ui-light, bird-ui-dark)
+# were collapsed into these two scheme-aware bundles.
+default: styles/application.scss
+bird-ui: styles/bird-ui.scss

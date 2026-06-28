@@ -1,0 +1,47 @@
+// Fork-specific Bird UI overrides (applied after the upstream Bird UI CSS).
+
+// Show the account switcher's SVG icon — Bird UI hides unknown nav icons and
+// swaps in its own background-image icons, leaving ours blank.
+.column-link#account-switcher-link .icon {
+  width: 22px;
+  height: 22px;
+  background-image: none !important;
+}
+
+.column-link#account-switcher-link .icon,
+.column-link#account-switcher-link .icon path {
+  display: block !important;
+  fill: currentColor !important;
+  color: inherit;
+  opacity: 1;
+}
+
+// Show the hamburger (More) icon beside the profile picture/name — Bird UI
+// would otherwise blank out this unknown icon.
+.navigation-panel__more-compact .icon,
+.navigation-panel__more-compact .icon path {
+  display: block !important;
+  fill: currentColor !important;
+  background-image: none !important;
+  opacity: 1;
+}
+
+// Logo area sized 50px box, 32px icon (Twitter-style nav).
+.column-link.column-link--logo {
+  width: 50px !important;
+  height: 50px !important;
+  background-size: 32px auto !important;
+}
+
+// Fixed navigation order for the Twitter-style theme (momodo fixed order):
+// Home, Notifications, Direct, Live feed, Bookmarks, Favourites, Lists,
+// Preferences, Account switcher.
+.navigation-panel__menu > li:has(a[href="/home"]) { order: 1 !important; }
+.navigation-panel__menu > li:has(a[href="/notifications"]) { order: 2 !important; }
+.navigation-panel__menu > li:has(a[href="/conversations"]) { order: 3 !important; }
+.navigation-panel__menu > li:has(a[href^="/public"]) { order: 4 !important; }
+.navigation-panel__menu > li:has(a[href="/bookmarks"]) { order: 5 !important; }
+.navigation-panel__menu > li:has(a[href="/favourites"]) { order: 6 !important; }
+.navigation-panel__menu > li:has(a[href="/lists"]) { order: 7 !important; }
+.navigation-panel__menu > li:has(a[href="/settings/preferences"]) { order: 8 !important; }
+.navigation-panel__menu > li:has(#account-switcher-link) { order: 9 !important; }

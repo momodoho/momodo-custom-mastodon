@@ -1,0 +1,31 @@
+- content_for :page_title do
+  = @room.title
+
+- content_for :heading_actions do
+  = link_to t('admin.rooms.export_csv'), export_admin_room_path(@room), class: 'button button-secondary'
+
+%p.muted-hint= t('admin.rooms.show_hint')
+
+%hr.spacer/
+
+.table-wrapper
+  %table.table
+    %thead
+      %tr
+        %th= t('admin.rooms.member')
+        %th= t('admin.rooms.role')
+        %th
+    %tbody
+      - @memberships.each do |membership|
+        - account = membership.account
+        %tr
+          %td
+            = link_to account.acct, admin_account_path(account.id)
+          %td
+            - if @room.owner?(account)
+              = t('admin.rooms.role_owner')
+            - else
+              = t('admin.rooms.role_member')
+          %td.text-right
+            - if !@room.owner?(account) && can?(:remove_member, @room)
+              = link_to t('admin.rooms.remove_member'), remove_member_admin_room_path(@room, account.id), data: { confirm: t('admin.rooms.remove_member_confirm', acct: account.acct), method: :delete }, class: 'table-action-link'

@@ -1,0 +1,110 @@
+# Local dev/verification stack for Mastodon 4.6 (isolated from the 4.2.1 live
+# instance — separate ports, volumes, and compose project).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mastodon
+      POSTGRES_PASSWORD: mastodon
+      POSTGRES_DB: mastodon_development
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'mastodon']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    image: momodo-mastodon:local
+    command: bash -c "rm -f /opt/mastodon/tmp/pids/server.pid; bundle exec puma -C config/puma.rb"
+    env_file: .env.dev.local
+    environment: &app_env
+      RAILS_ENV: development
+      NODE_ENV: development
+      BUNDLE_WITHOUT: production
+      DB_HOST: db
+      DB_USER: mastodon
+      DB_PASS: mastodon
+      DB_NAME: mastodon_development
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      LOCAL_DOMAIN: localhost
+      WEB_DOMAIN: localhost
+      LOCAL_HTTPS: 'true'
+      DISABLE_FORGERY_REQUEST_PROTECTION: 'true'
+      STREAMING_API_BASE_URL: wss://localhost
+      # momodo: closed community (federation off + REST API login-required) is now
+      # the code default (config/mastodon.yml), so no LIMITED_FEDERATION_MODE /
+      # DISALLOW_UNAUTHENTICATED_API_ACCESS ENV is needed here — this matches a
+      # plain official install.
+      PORT: '3000'
+      BIND: 0.0.0.0
+    ports:
+      - '3001:3000'
+    volumes:
+      - .:/opt/mastodon
+      - node-modules:/opt/mastodon/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  vite:
+    image: momodo-mastodon:local
+    command: bash -c "yarn dev --host 0.0.0.0 --port 3036"
+    environment:
+      <<: *app_env
+    ports:
+      - '3036:3036'
+    volumes:
+      - .:/opt/mastodon
+      - node-modules:/opt/mastodon/node_modules
+
+  sidekiq:
+    image: momodo-mastodon:local
+    command: bundle exec sidekiq
+    env_file: .env.dev.local
+    environment: *app_env
+    volumes:
+      - .:/opt/mastodon
+      - node-modules:/opt/mastodon/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  streaming:
+    image: momodo-mastodon:local
+    command: bash -c "node ./streaming/index.js"
+    env_file: .env.dev.local
+    environment:
+      <<: *app_env
+      PORT: '4000'
+    ports:
+      - '4001:4000'
+    volumes:
+      - .:/opt/mastodon
+      - node-modules:/opt/mastodon/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pg-data:
+  redis-data:
+  node-modules:

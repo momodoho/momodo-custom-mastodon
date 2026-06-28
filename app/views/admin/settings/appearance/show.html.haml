@@ -1,0 +1,75 @@
+- content_for :page_title do
+  = t('admin.settings.appearance.title')
+
+- content_for :heading do
+  %h1= t('admin.settings.title')
+  = render partial: 'admin/settings/shared/links'
+
+= simple_form_for @admin_settings, url: admin_settings_appearance_path do |f|
+  = render 'shared/error_messages', object: @admin_settings
+
+  %p.lead= t('admin.settings.appearance.preamble')
+
+  .fields-group
+    = f.input :theme,
+              collection: Themes.instance.names,
+              include_blank: false,
+              label_method: ->(theme) { I18n.t("themes.#{theme}", default: theme) },
+              wrapper: :with_label
+
+  .fields-group
+    = f.input :custom_css,
+              as: :text,
+              input_html: { rows: 8 },
+              wrapper: :with_block_label
+
+  .fields-row
+    .fields-row__column.fields-row__column-6.fields-group
+      = f.input :mascot,
+                as: :file,
+                wrapper: :with_block_label
+
+    .fields-row__column.fields-row__column-6.fields-group
+      - if @admin_settings.mascot.persisted?
+        = image_tag @admin_settings.mascot.file.url, class: 'fields-group__thumbnail'
+        = link_to admin_site_upload_path(@admin_settings.mascot), data: { method: :delete }, class: 'link-button link-button--destructive' do
+          = material_symbol 'delete'
+          = t('admin.site_uploads.delete')
+
+  %hr.spacer/
+
+  %h4= t('admin.settings.appearance.branding_uploads')
+  %p.lead= t('admin.settings.appearance.branding_uploads_hint')
+
+  -# Only the section for the currently-selected theme (above) is shown; the
+  -# inline script below toggles them. Both stay in the DOM so every field still
+  -# submits.
+  - Themes.instance.names.each do |theme_name|
+    - token = theme_name == 'bird-ui' ? 'birdui' : 'default'
+    .brand-theme-section{ data: { brand_theme: theme_name } }
+      %hr.spacer/
+      %h5= t("admin.settings.appearance.brand_theme_#{token}")
+      - %w(logo login_bg app_bg).each do |asset|
+        - %w(light dark).each do |scheme|
+          - key = "#{asset}_#{token}_#{scheme}"
+          .fields-row
+            .fields-row__column.fields-row__column-6.fields-group
+              = f.input key.to_sym,
+                        as: :file,
+                        label: t("admin.settings.appearance.#{asset}_#{scheme}"),
+                        wrapper: :with_block_label
+            .fields-row__column.fields-row__column-6.fields-group
+              - upload = @admin_settings.public_send(key)
+              - if upload.persisted?
+                = image_tag upload.file.url, class: 'fields-group__thumbnail'
+                = link_to admin_site_upload_path(upload), data: { method: :delete }, class: 'link-button link-button--destructive' do
+                  = material_symbol 'delete'
+                  = t('admin.site_uploads.delete')
+
+  -# Show only the selected theme's upload slots, and switch live when the theme
+  -# dropdown changes. Nonce required or CSP blocks the inline script.
+  - brand_switch_js = "(function(){var s=document.querySelector('select[name$=\"[theme]\"]');var b=document.querySelectorAll('.brand-theme-section');if(!s||!b.length){return;}function u(){for(var i=0;i<b.length;i++){b[i].style.display=(b[i].getAttribute('data-brand-theme')===s.value)?'':'none';}}s.addEventListener('change',u);u();})();"
+  = content_tag :script, brand_switch_js.html_safe, nonce: request.content_security_policy_nonce
+
+  .actions
+    = f.button :button, t('generic.save_changes'), type: :submit

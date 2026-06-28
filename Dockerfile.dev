@@ -1,0 +1,32 @@
+# Development image for Mastodon 4.6 (Ruby 4.0.5 + Node 24 + Yarn 4/Berry + Vite).
+FROM ruby:4.0.5-bookworm
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    BUNDLE_PATH=/usr/local/bundle \
+    RAILS_ENV=development \
+    NODE_ENV=development
+
+# Node 24 + OS libraries for native gems and media processing, plus Yarn via corepack.
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+    apt-get update && apt-get install -y --no-install-recommends \
+      build-essential git \
+      libgdbm-dev libgmp-dev libicu-dev libidn-dev libpq-dev \
+      libssl-dev libyaml-dev shared-mime-info zlib1g-dev libreadline-dev \
+      ca-certificates python3 nodejs imagemagick ffmpeg file tzdata \
+      libvips42 && \
+    npm i -g corepack && corepack enable && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/mastodon
+
+# Gems (cached unless Gemfile changes).
+COPY Gemfile Gemfile.lock /opt/mastodon/
+RUN bundle config set --local without 'production' && \
+    bundle install -j"$(nproc)"
+
+# JS deps (Yarn 4 Berry workspaces; node-modules linker). Needs full source for
+# workspace package.jsons; lives in a named volume at runtime.
+COPY . /opt/mastodon/
+RUN corepack enable && (yarn install --immutable || yarn install)
+
+CMD ["bash"]

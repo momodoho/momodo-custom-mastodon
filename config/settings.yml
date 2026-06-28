@@ -1,0 +1,51 @@
+# This file contains default values, and does not need to be edited. All
+# important settings can be changed from the admin interface.
+
+defaults: &defaults
+  site_title: Mastodon
+  site_short_description: ''
+  site_description: ''
+  site_extended_description: ''
+  site_terms: ''
+  site_contact_username: ''
+  site_contact_email: ''
+  # momodo: open registration — anyone can sign up on this server directly
+  # (email confirmation only, no admin approval)
+  registrations_mode: 'open'
+  profile_directory: false
+  closed_registrations_message: ''
+  # momodo: closed community — feeds require login (nothing visible to anon).
+  local_live_feed_access: 'authenticated'
+  remote_live_feed_access: 'authenticated'
+  local_topic_feed_access: 'authenticated'
+  remote_topic_feed_access: 'authenticated'
+  show_staff_badge: true
+  preview_sensitive_media: false
+  noindex: false
+  # momodo: default UI is the Twitter-style Bird UI theme (light/dark via the
+  # color-scheme toggle).
+  theme: 'bird-ui'
+  thumbnail_description: ''
+  trends: false
+  trendable_by_default: false
+  disallowed_hashtags: # space separated string or list of hashtags without the hash
+  bootstrap_timeline_accounts: ''
+  activity_api_enabled: true
+  peers_api_enabled: true
+  show_domain_blocks: 'disabled'
+  show_domain_blocks_rationale: 'disabled'
+  require_invite_text: false
+  backups_retention_period: 7
+  captcha_enabled: false
+  allow_referrer_origin: false
+  landing_page: 'about'
+  wrapstodon: true
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults

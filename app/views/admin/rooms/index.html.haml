@@ -1,0 +1,30 @@
+- content_for :page_title do
+  = t('admin.rooms.title')
+
+%p.muted-hint= t('admin.rooms.hint')
+
+%hr.spacer/
+
+- if @rooms.empty?
+  .muted-hint.center-text
+    = t('admin.rooms.empty')
+- else
+  .table-wrapper
+    %table.table
+      %thead
+        %tr
+          %th= t('admin.rooms.name')
+          %th= t('admin.rooms.owner')
+          %th= t('admin.rooms.members')
+          %th= t('admin.rooms.created_at')
+          %th
+      %tbody
+        - @rooms.each do |room|
+          %tr
+            %td= link_to room.title, admin_room_path(room)
+            %td= room.account.acct
+            %td= room.memberships.size
+            %td= l(room.created_at)
+            %td= link_to t('admin.rooms.export_csv'), export_admin_room_path(room), class: 'button button-secondary'
+
+  = paginate @rooms
