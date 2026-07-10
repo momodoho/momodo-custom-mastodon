@@ -45,3 +45,28 @@
 .navigation-panel__menu > li:has(a[href="/lists"]) { order: 7 !important; }
 .navigation-panel__menu > li:has(a[href="/settings/preferences"]) { order: 8 !important; }
 .navigation-panel__menu > li:has(#account-switcher-link) { order: 9 !important; }
+
+// momodo: profile counters (Followers / Following / Posts) — our markup puts the
+// label INSIDE the link so the whole "Followers 12" is clickable, but the Bird UI
+// dist assumes label and number are separate flex children of the <li>
+// (row-reverse → "12 followers"). With a single <a> child that rule is a no-op and
+// the CSS-module `.label { display: block }` stacks the linked items vertically
+// while the unlinked Posts item still gets the Twitter style — mismatched row.
+// Recreate the Twitter-style counter inside the link itself.
+.layout-single-column,
+.layout-multiple-columns {
+  [class*='_comp_number_fields__item'] > a {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  [class*='_comp_number_fields__item'] [class*='_comp_number_fields__label'] {
+    display: inline;
+    text-transform: lowercase;
+    color: var(--color-dim);
+    font-size: var(--font-size-mid);
+    font-weight: 500;
+  }
+}

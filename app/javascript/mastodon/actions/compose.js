@@ -60,6 +60,9 @@ export const COMPOSE_COMPOSING_CHANGE    = 'COMPOSE_COMPOSING_CHANGE';
 export const COMPOSE_LANGUAGE_CHANGE     = 'COMPOSE_LANGUAGE_CHANGE';
 
 export const COMPOSE_EMOJI_INSERT = 'COMPOSE_EMOJI_INSERT';
+// momodo: scheduled statuses
+export const COMPOSE_SCHEDULED_AT_CHANGE = 'COMPOSE_SCHEDULED_AT_CHANGE';
+export const COMPOSE_SCHEDULED_LOAD = 'COMPOSE_SCHEDULED_LOAD';
 export const COMPOSE_MARKDOWN_INSERT = 'COMPOSE_MARKDOWN_INSERT'; // momodo: Discord-style text effects
 
 export const COMPOSE_POLL_ADD             = 'COMPOSE_POLL_ADD';
@@ -85,6 +88,7 @@ const messages = defineMessages({
   open: { id: 'compose.published.open', defaultMessage: 'Open' },
   published: { id: 'compose.published.body', defaultMessage: 'Post published.' },
   saved: { id: 'compose.saved.body', defaultMessage: 'Post saved.' },
+  scheduledSuccess: { id: 'compose.scheduled_success', defaultMessage: 'Post scheduled' },
   blankPostError: { id: 'compose.error.blank_post', defaultMessage: 'Post can\'t be blank.' },
 });
 
@@ -245,6 +249,7 @@ export function submitCompose(successCallback) {
         poll: getState().getIn(['compose', 'poll'], null),
         language: getState().getIn(['compose', 'language']),
         quoted_status_id: getState().getIn(['compose', 'quoted_status_id']),
+        scheduled_at: statusId === null ? getState().getIn(['compose', 'scheduled_at'], null) : null, // momodo: scheduled statuses
         quote_approval_policy: visibility === 'private' || visibility === 'direct' ? 'nobody' : getState().getIn(['compose', 'quote_policy']),
       },
       headers: {
@@ -253,6 +258,17 @@ export function submitCompose(successCallback) {
     }).then(function (response) {
       if ((browserHistory.location.pathname === '/publish' || browserHistory.location.pathname === '/statuses/new') && window.history.state) {
         browserHistory.goBack();
+      }
+
+      // momodo: a scheduled status comes back as a ScheduledStatus (has params,
+      // no visibility) — reset the compose box, toast, and skip timeline insertion
+      if (statusId === null && response.data.params) {
+        dispatch(submitComposeSuccess({ ...response.data }));
+        dispatch(showAlert({ message: messages.scheduledSuccess }));
+        if (typeof successCallback === 'function') {
+          successCallback(response.data);
+        }
+        return;
       }
 
       dispatch(insertIntoTagHistory(response.data.tags, status));
@@ -768,6 +784,25 @@ export function insertMarkdownCompose(start, end, prefix, suffix) {
     suffix,
   };
 }
+
+// momodo: scheduled statuses — set/clear the scheduled time (ISO string or null)
+export function changeComposeScheduledAt(value) {
+  return {
+    type: COMPOSE_SCHEDULED_AT_CHANGE,
+    value,
+  };
+}
+
+// momodo: scheduled statuses — load a cancelled scheduled status back into the
+// compose box (the "edit = delete + re-schedule" flow)
+export const loadScheduledStatusCompose = (params) => (dispatch, getState) => {
+  dispatch({
+    type: COMPOSE_SCHEDULED_LOAD,
+    params,
+  });
+
+  ensureComposeIsVisible(getState);
+};
 
 export function changeComposing(value) {
   return {

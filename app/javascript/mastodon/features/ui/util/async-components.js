@@ -50,6 +50,11 @@ export function Rooms () {
   return import('../../rooms');
 }
 
+// momodo: scheduled statuses (예약툿)
+export function ScheduledStatuses () {
+  return import('../../scheduled_statuses');
+}
+
 export function RoomMembers () {
   return import('../../room_timeline/members');
 }

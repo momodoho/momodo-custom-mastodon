@@ -32,6 +32,7 @@
   /publish
   /rooms
   /rooms/(*any)
+  /scheduled_statuses
   /search
   /start/(*any)
   /statuses/(*any)

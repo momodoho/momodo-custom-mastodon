@@ -51,6 +51,10 @@ class PostStatusService < BaseService
       validate_media!
       preprocess_attributes!
 
+      # momodo: room posts cannot be scheduled — the room object wouldn't survive
+      # the params round-trip, and rooms are live-only by design
+      raise Mastodon::ValidationError, I18n.t('rooms.errors.no_scheduling') if @room && scheduled?
+
       if scheduled?
         schedule_status!
       else
@@ -316,6 +320,7 @@ class PostStatusService < BaseService
       options_hash[:scheduled_at]    = nil
       options_hash[:idempotency]     = nil
       options_hash[:with_rate_limit] = false
+      options_hash.delete(:room) # momodo: belt-and-braces — rooms are never scheduled
     end
   end
 end

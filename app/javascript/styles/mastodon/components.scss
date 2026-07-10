@@ -11493,3 +11493,126 @@ noscript {
   .logo--custom-light { display: none !important; }
   .logo--custom-dark { display: block !important; }
 }
+
+// momodo: scheduled statuses — compose clock dropdown + hint + list screen
+.compose-form__schedule-hint {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: 4px 2px;
+}
+
+.schedule-dropdown__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  min-width: 230px;
+}
+
+.schedule-dropdown__input {
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  background: transparent;
+  color: inherit;
+}
+
+.schedule-dropdown__note {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.schedule-dropdown__presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.schedule-dropdown__preset,
+.schedule-dropdown__clear {
+  appearance: none;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  background: transparent;
+  color: inherit;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    background: rgba(128, 128, 128, 0.15);
+  }
+}
+
+.schedule-dropdown__clear {
+  border-color: rgba(220, 100, 100, 0.5);
+}
+
+.scheduled-statuses__item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border, rgba(128, 128, 128, 0.2));
+}
+
+.scheduled-statuses__item__time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+
+  .scheduled-statuses__item__reply-chip {
+    font-weight: 500;
+    border: 1px solid rgba(128, 128, 128, 0.4);
+    border-radius: 10px;
+    padding: 0 8px;
+  }
+}
+
+.scheduled-statuses__item__text {
+  font-size: 15px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.scheduled-statuses__item__meta {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.scheduled-statuses__item__actions {
+  display: flex;
+  gap: 12px;
+
+  button {
+    appearance: none;
+    border: 1px solid rgba(128, 128, 128, 0.4);
+    background: transparent;
+    color: inherit;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      background: rgba(128, 128, 128, 0.15);
+    }
+
+    &.danger {
+      border-color: rgba(220, 100, 100, 0.5);
+    }
+  }
+}
+
+.scheduled-statuses__empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}

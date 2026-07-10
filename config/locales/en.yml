@@ -2044,6 +2044,7 @@ en:
   rooms:
     errors:
       images_only: Only images can be attached in group messages.
+      no_scheduling: Room posts cannot be scheduled.
       not_a_member: You are not a member of this room.
   rss:
     content_warning: 'Content warning:'

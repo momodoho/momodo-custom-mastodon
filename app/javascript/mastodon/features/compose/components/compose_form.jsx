@@ -25,6 +25,7 @@ import { countableText } from '../util/counter';
 import { CharacterCounter } from './character_counter';
 import { EditIndicator } from './edit_indicator';
 import { FormatDropdown } from './format_dropdown';
+import { ScheduleDropdown } from './schedule_dropdown';
 import { LanguageDropdown } from './language_dropdown';
 import { NavigationBar } from './navigation_bar';
 import { PollForm } from "./poll_form";
@@ -40,6 +41,8 @@ const messages = defineMessages({
   placeholder: { id: 'compose_form.placeholder', defaultMessage: 'What is on your mind?' },
   spoiler_placeholder: { id: 'compose_form.spoiler_placeholder', defaultMessage: 'Content warning (optional)' },
   publish: { id: 'compose_form.publish', defaultMessage: 'Post' },
+  schedulePublish: { id: 'compose_form.schedule_publish', defaultMessage: 'Schedule' },
+  scheduledFor: { id: 'compose_form.scheduled_for', defaultMessage: 'Scheduled for {time}' },
   saveChanges: { id: 'compose_form.save_changes', defaultMessage: 'Update' },
   reply: { id: 'compose_form.reply', defaultMessage: 'Reply' },
 });
@@ -69,6 +72,7 @@ class ComposeForm extends ImmutablePureComponent {
     onDrop: PropTypes.func.isRequired,
     onPickEmoji: PropTypes.func.isRequired,
     onInsertMarkdown: PropTypes.func.isRequired,
+    scheduledAt: PropTypes.string,
     autoFocus: PropTypes.bool,
     withoutNavigation: PropTypes.bool,
     anyMedia: PropTypes.bool,
@@ -331,6 +335,11 @@ class ComposeForm extends ImmutablePureComponent {
           <ComposeQuotedStatus />
 
           <div className='compose-form__footer'>
+            {this.props.scheduledAt && (
+              <div className='compose-form__schedule-hint'>
+                {intl.formatMessage(messages.scheduledFor, { time: intl.formatDate(this.props.scheduledAt, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) })}
+              </div>
+            )}
             <div className='compose-form__actions'>
               <div className='compose-form__buttons'>
                 <UploadButtonContainer />
@@ -338,6 +347,7 @@ class ComposeForm extends ImmutablePureComponent {
                 <SpoilerButtonContainer />
                 <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
                 <FormatDropdown onSelect={this.handleFormatSelect} disabled={isSubmitting} />
+                {!this.props.isEditing && <ScheduleDropdown disabled={isSubmitting} />}
                 <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
               </div>
 
@@ -351,7 +361,7 @@ class ComposeForm extends ImmutablePureComponent {
                   {intl.formatMessage(
                     this.props.isEditing ?
                       messages.saveChanges :
-                      (this.props.isInReply ? messages.reply : messages.publish)
+                      (this.props.scheduledAt ? messages.schedulePublish : (this.props.isInReply ? messages.reply : messages.publish))
                   )}
                 </Button>
               </div>

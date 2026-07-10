@@ -46,6 +46,8 @@ import {
   COMPOSE_COMPOSING_CHANGE,
   COMPOSE_EMOJI_INSERT,
   COMPOSE_MARKDOWN_INSERT,
+  COMPOSE_SCHEDULED_AT_CHANGE,
+  COMPOSE_SCHEDULED_LOAD,
   COMPOSE_RESET,
   COMPOSE_POLL_ADD,
   COMPOSE_POLL_REMOVE,
@@ -92,6 +94,7 @@ const initialState = ImmutableMap({
   default_language: 'en',
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
+  scheduled_at: null, // momodo: scheduled statuses
   tagHistory: ImmutableList(),
 
   // Quotes
@@ -136,6 +139,7 @@ function clearAll(state) {
     map.set('quoted_status_id', null);
     map.set('quote_policy', state.get('default_quote_policy'));
     map.set('isDragDisabled', false);
+    map.set('scheduled_at', null); // momodo: scheduled statuses
   });
 }
 
@@ -546,6 +550,22 @@ export const composeReducer = (state = initialState, action) => {
     return insertEmoji(state, action.position, action.emoji, action.needsSpace);
   case COMPOSE_MARKDOWN_INSERT:
     return insertMarkdown(state, action.start, action.end, action.prefix, action.suffix);
+  case COMPOSE_SCHEDULED_AT_CHANGE: // momodo: scheduled statuses
+    return state.set('scheduled_at', action.value).set('idempotencyKey', uuid());
+  case COMPOSE_SCHEDULED_LOAD: // momodo: "edit" a scheduled status = load it back into compose
+    return state.withMutations(map => {
+      map.set('id', null);
+      map.set('text', action.params.text || '');
+      map.set('in_reply_to', action.params.in_reply_to_id ? String(action.params.in_reply_to_id) : null);
+      map.set('privacy', action.params.visibility || state.get('default_privacy'));
+      map.set('spoiler', !!action.params.spoiler_text);
+      map.set('spoiler_text', action.params.spoiler_text || '');
+      map.set('sensitive', !!action.params.sensitive);
+      map.set('scheduled_at', null);
+      map.set('focusDate', new Date());
+      map.set('caretPosition', null);
+      map.set('idempotencyKey', uuid());
+    });
   case REDRAFT:
     return state.withMutations(map => {
       map.set('text', action.raw_text || unescapeHTML(expandMentions(action.status)));

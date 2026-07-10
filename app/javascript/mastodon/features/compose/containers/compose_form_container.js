@@ -39,6 +39,7 @@ const processPasteOrDrop = (transfer, e, dispatch) => {
 
 const mapStateToProps = state => ({
   text: state.getIn(['compose', 'text']),
+  scheduledAt: state.getIn(['compose', 'scheduled_at']), // momodo: scheduled statuses
   suggestions: state.getIn(['compose', 'suggestions']),
   spoiler: state.getIn(['compose', 'spoiler']),
   spoilerText: state.getIn(['compose', 'spoiler_text']),
