@@ -20,6 +20,7 @@ import CollectionsIcon from '@/material-icons/400-24px/category.svg?react';
 import GroupsActiveIcon from '@/material-icons/400-24px/groups-fill.svg?react';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import ScheduleIcon from '@/material-icons/400-24px/schedule.svg?react';
+import MarkEmailUnreadIcon from '@/material-icons/400-24px/mark_email_unread.svg?react';
 import HomeActiveIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home.svg?react';
 import InfoIcon from '@/material-icons/400-24px/info.svg?react';
@@ -83,6 +84,7 @@ const messages = defineMessages({
   direct: { id: 'navigation_bar.direct', defaultMessage: 'Private mentions' },
   rooms: { id: 'navigation_bar.rooms', defaultMessage: 'Rooms' },
   scheduledStatuses: { id: 'navigation_bar.scheduled_statuses', defaultMessage: 'Scheduled posts' },
+  unrepliedMentions: { id: 'navigation_bar.unreplied_mentions', defaultMessage: 'Unreplied messages' },
   favourites: { id: 'navigation_bar.favourites', defaultMessage: 'Favorites' },
   bookmarks: { id: 'navigation_bar.bookmarks', defaultMessage: 'Bookmarks' },
   collections: {
@@ -380,6 +382,15 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
                 icon='at'
                 iconComponent={AlternateEmailIcon}
                 text={intl.formatMessage(messages.direct)}
+              />
+            </li>
+            <li>
+              <ColumnLink
+                transparent
+                to='/unreplied_mentions'
+                icon='envelope'
+                iconComponent={MarkEmailUnreadIcon}
+                text={intl.formatMessage(messages.unrepliedMentions)}
               />
             </li>
             <li>

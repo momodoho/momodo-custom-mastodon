@@ -55,6 +55,11 @@ export function ScheduledStatuses () {
   return import('../../scheduled_statuses');
 }
 
+// momodo: 답장 안 한 메시지
+export function UnrepliedMentions () {
+  return import('../../unreplied_mentions');
+}
+
 export function RoomMembers () {
   return import('../../room_timeline/members');
 }

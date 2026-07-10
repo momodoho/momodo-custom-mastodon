@@ -69,6 +69,7 @@ import {
   RoomMembers,
   Rooms,
   ScheduledStatuses,
+  UnrepliedMentions,
   Collections,
   CollectionDetail,
   CollectionsEditor,
@@ -220,6 +221,7 @@ class SwitchingColumnsArea extends PureComponent {
             <WrappedRoute path='/lists/:id' component={ListTimeline} content={children} />
             <WrappedRoute path='/rooms' exact component={Rooms} content={children} />
             <WrappedRoute path='/scheduled_statuses' exact component={ScheduledStatuses} content={children} />
+            <WrappedRoute path='/unreplied_mentions' exact component={UnrepliedMentions} content={children} />
             <WrappedRoute path='/rooms/:id/members' component={RoomMembers} content={children} />
             <WrappedRoute path='/rooms/:id' component={RoomTimeline} content={children} />
             <WrappedRoute path='/notifications' component={Notifications} content={children} exact />

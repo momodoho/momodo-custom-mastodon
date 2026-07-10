@@ -33,6 +33,7 @@
   /rooms
   /rooms/(*any)
   /scheduled_statuses
+  /unreplied_mentions
   /search
   /start/(*any)
   /statuses/(*any)

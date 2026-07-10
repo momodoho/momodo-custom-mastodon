@@ -112,6 +112,7 @@ namespace :api, format: false do
     resources :mutes, only: [:index]
     resources :favourites, only: [:index]
     resources :bookmarks, only: [:index]
+    resources :unreplied_mentions, only: [:index] # momodo: 답장 안 한 메시지
     resources :reports, only: [:create]
     resources :trends, only: [:index], controller: 'trends/tags'
     resources :filters, only: [:index, :create, :show, :update, :destroy]
