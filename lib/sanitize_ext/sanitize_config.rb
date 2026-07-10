@@ -32,6 +32,7 @@ class Sanitize
         next true if /^(mention|hashtag)$/.match?(e) # semantic classes
         next true if /^(ellipsis|invisible)$/.match?(e) # link formatting classes
         next true if e == 'quote-inline'
+        next true if /^md-(spoiler|codeblock)$/.match?(e) # momodo: Discord-style text effects
       end
 
       node['class'] = class_list.join(' ')

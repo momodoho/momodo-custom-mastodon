@@ -18,6 +18,7 @@ class TextFormatter
   # @param [String] text
   # @param [Hash] options
   # @option options [Boolean] :multiline
+  # @option options [Boolean] :markdown
   # @option options [Boolean] :with_domains
   # @option options [Boolean] :with_rel_me
   # @option options [Array<Account>] :preloaded_accounts
@@ -43,6 +44,7 @@ class TextFormatter
       end
     end
 
+    html = MomodoMarkdown.new(html).to_s if markdown?
     html = simple_format(html, {}, sanitize: false).delete("\n") if multiline?
     html = add_quote_fallback(html) if options[:quoted_status].present?
 
@@ -160,6 +162,11 @@ class TextFormatter
 
   def multiline?
     options[:multiline]
+  end
+
+  # momodo: Discord-style text effects (statuses only)
+  def markdown?
+    options[:markdown]
   end
 
   def with_domains?

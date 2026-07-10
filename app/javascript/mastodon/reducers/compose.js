@@ -45,6 +45,7 @@ import {
   COMPOSE_LANGUAGE_CHANGE,
   COMPOSE_COMPOSING_CHANGE,
   COMPOSE_EMOJI_INSERT,
+  COMPOSE_MARKDOWN_INSERT,
   COMPOSE_RESET,
   COMPOSE_POLL_ADD,
   COMPOSE_POLL_REMOVE,
@@ -228,6 +229,20 @@ const insertEmoji = (state, position, emojiData, needsSpace) => {
     text: `${oldText.slice(0, position)}${emoji} ${oldText.slice(position)}`,
     focusDate: new Date(),
     caretPosition: position + emoji.length + 1,
+    idempotencyKey: uuid(),
+  });
+};
+
+// momodo: Discord-style text effects — wrap the selection (or insert an empty
+// pair and leave the caret between the delimiters)
+const insertMarkdown = (state, start, end, prefix, suffix) => {
+  const oldText = state.get('text');
+  const selection = oldText.slice(start, end);
+
+  return state.merge({
+    text: `${oldText.slice(0, start)}${prefix}${selection}${suffix}${oldText.slice(end)}`,
+    focusDate: new Date(),
+    caretPosition: selection.length > 0 ? end + prefix.length + suffix.length : start + prefix.length,
     idempotencyKey: uuid(),
   });
 };
@@ -529,6 +544,8 @@ export const composeReducer = (state = initialState, action) => {
     }
   case COMPOSE_EMOJI_INSERT:
     return insertEmoji(state, action.position, action.emoji, action.needsSpace);
+  case COMPOSE_MARKDOWN_INSERT:
+    return insertMarkdown(state, action.start, action.end, action.prefix, action.suffix);
   case REDRAFT:
     return state.withMutations(map => {
       map.set('text', action.raw_text || unescapeHTML(expandMentions(action.status)));

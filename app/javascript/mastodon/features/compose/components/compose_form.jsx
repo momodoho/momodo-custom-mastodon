@@ -24,6 +24,7 @@ import { countableText } from '../util/counter';
 
 import { CharacterCounter } from './character_counter';
 import { EditIndicator } from './edit_indicator';
+import { FormatDropdown } from './format_dropdown';
 import { LanguageDropdown } from './language_dropdown';
 import { NavigationBar } from './navigation_bar';
 import { PollForm } from "./poll_form";
@@ -67,6 +68,7 @@ class ComposeForm extends ImmutablePureComponent {
     onPaste: PropTypes.func.isRequired,
     onDrop: PropTypes.func.isRequired,
     onPickEmoji: PropTypes.func.isRequired,
+    onInsertMarkdown: PropTypes.func.isRequired,
     autoFocus: PropTypes.bool,
     withoutNavigation: PropTypes.bool,
     anyMedia: PropTypes.bool,
@@ -246,6 +248,14 @@ class ComposeForm extends ImmutablePureComponent {
     this.props.onPickEmoji(position, data, needsSpace);
   };
 
+  // momodo: Discord-style text effects — insert at the cursor / wrap the selection
+  handleFormatSelect = (prefix, suffix) => {
+    const start = this.textareaRef.current.selectionStart;
+    const end   = this.textareaRef.current.selectionEnd;
+
+    this.props.onInsertMarkdown(start, end, prefix, suffix);
+  };
+
   render () {
     const { intl, onPaste, onDrop, autoFocus, withoutNavigation, maxChars, isSubmitting } = this.props;
 
@@ -327,6 +337,7 @@ class ComposeForm extends ImmutablePureComponent {
                 <PollButtonContainer />
                 <SpoilerButtonContainer />
                 <EmojiPickerDropdown onPickEmoji={this.handleEmojiPick} />
+                <FormatDropdown onSelect={this.handleFormatSelect} disabled={isSubmitting} />
                 <CharacterCounter max={maxChars} text={this.getFulltextForCharacterCounting()} />
               </div>
 

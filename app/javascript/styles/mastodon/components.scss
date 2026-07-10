@@ -1053,6 +1053,59 @@ body > [data-popper-placement] {
   clear: both;
 }
 
+// momodo: Discord-style text effects (`code`, ```blocks```, ||spoiler||)
+.status__content,
+.edit-indicator__content,
+.reply-indicator__content {
+  code {
+    font-family: $font-monospace, monospace;
+    font-size: 0.85em;
+    background: rgba(128, 128, 128, 0.18);
+    border-radius: 4px;
+    padding: 1px 4px;
+  }
+
+  code.md-codeblock {
+    display: block;
+    white-space: pre-wrap;
+    padding: 8px 10px;
+    margin: 4px 0;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+  }
+
+  .md-spoiler {
+    border-radius: 4px;
+    padding: 0 2px;
+
+    // hidden state — everywhere except admin pages (server-rendered, no
+    // click-to-reveal JS there, and moderators must see the contents)
+    body:not(.admin) &:not(.md-spoiler--revealed) {
+      cursor: pointer;
+      user-select: none;
+      background: rgba(128, 128, 128, 0.85);
+      color: transparent;
+
+      a,
+      span,
+      code,
+      strong,
+      em,
+      u,
+      del {
+        color: transparent !important;
+      }
+
+      img {
+        visibility: hidden;
+      }
+    }
+
+    &.md-spoiler--revealed {
+      background: rgba(128, 128, 128, 0.25);
+    }
+  }
+}
+
 .status__content,
 .edit-indicator__content,
 .reply-indicator__content {

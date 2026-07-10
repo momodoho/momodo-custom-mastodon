@@ -17,6 +17,7 @@ import { languages as preloadedLanguages } from 'mastodon/initial_state';
 
 import { EmojiHTML } from './emoji/html';
 import { injectIntl } from './intl';
+import { MdSpoiler } from './md_spoiler';
 import { HandledLink } from './status/handled_link';
 import { compareUrls } from '../utils/compare_urls';
 
@@ -133,7 +134,8 @@ class StatusContent extends PureComponent {
 
     let element = e.target;
     while (element) {
-      if (element.localName === 'button' || element.localName === 'a' || element.localName === 'label') {
+      // momodo: md-spoiler handles its own clicks (reveal) — don't open the status
+      if (element.localName === 'button' || element.localName === 'a' || element.localName === 'label' || (element.classList && element.classList.contains('md-spoiler'))) {
         return;
       }
       element = element.parentNode;
@@ -178,6 +180,13 @@ class StatusContent extends PureComponent {
       );
     } else if (element.classList.contains('quote-inline') && this.props.status.get('quote')) {
       return null;
+    } else if (element.classList.contains('md-spoiler')) {
+      // momodo: Discord-style ||spoiler|| — click to reveal
+      return (
+        <MdSpoiler {...props} key={key}>
+          {children}
+        </MdSpoiler>
+      );
     }
     return undefined;
   }

@@ -60,6 +60,7 @@ export const COMPOSE_COMPOSING_CHANGE    = 'COMPOSE_COMPOSING_CHANGE';
 export const COMPOSE_LANGUAGE_CHANGE     = 'COMPOSE_LANGUAGE_CHANGE';
 
 export const COMPOSE_EMOJI_INSERT = 'COMPOSE_EMOJI_INSERT';
+export const COMPOSE_MARKDOWN_INSERT = 'COMPOSE_MARKDOWN_INSERT'; // momodo: Discord-style text effects
 
 export const COMPOSE_POLL_ADD             = 'COMPOSE_POLL_ADD';
 export const COMPOSE_POLL_REMOVE          = 'COMPOSE_POLL_REMOVE';
@@ -753,6 +754,18 @@ export function insertEmojiCompose(position, emoji, needsSpace) {
     position,
     emoji,
     needsSpace,
+  };
+}
+
+// momodo: insert a Discord-style formatting command at the cursor,
+// wrapping the current selection if there is one
+export function insertMarkdownCompose(start, end, prefix, suffix) {
+  return {
+    type: COMPOSE_MARKDOWN_INSERT,
+    start,
+    end,
+    prefix,
+    suffix,
   };
 }
 

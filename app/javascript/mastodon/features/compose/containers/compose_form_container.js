@@ -8,6 +8,7 @@ import {
   selectComposeSuggestion,
   changeComposeSpoilerText,
   insertEmojiCompose,
+  insertMarkdownCompose,
   uploadCompose,
 } from 'mastodon/actions/compose';
 import { pasteLinkCompose } from 'mastodon/actions/compose_typed';
@@ -113,6 +114,11 @@ const mapDispatchToProps = (dispatch, props) => ({
 
   onPickEmoji (position, data, needsSpace) {
     dispatch(insertEmojiCompose(position, data, needsSpace));
+  },
+
+  // momodo: Discord-style text effects
+  onInsertMarkdown (start, end, prefix, suffix) {
+    dispatch(insertMarkdownCompose(start, end, prefix, suffix));
   },
 
 });

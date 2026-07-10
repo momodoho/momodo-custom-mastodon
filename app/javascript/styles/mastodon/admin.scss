@@ -2511,3 +2511,12 @@ a.sparkline {
     }
   }
 }
+
+// momodo: Discord-style text effects — the hide rule in components.scss is
+// scoped to body:not(.admin), so on admin pages spoilers just get a subtle
+// backdrop and stay readable for moderators.
+body.admin .md-spoiler {
+  background: rgba(128, 128, 128, 0.25);
+  border-radius: 4px;
+  padding: 0 2px;
+}
