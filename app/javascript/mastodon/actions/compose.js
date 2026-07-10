@@ -287,9 +287,10 @@ export function submitCompose(successCallback) {
         }
       };
 
-      if (statusId) {
-        dispatch(importFetchedStatus({ ...response.data }));
-      }
+      // momodo: always import the created/edited status — live views (e.g. the
+      // unreplied-messages column) need new replies in the store immediately,
+      // including direct ones that never hit a loaded timeline
+      dispatch(importFetchedStatus({ ...response.data }));
 
       if (statusId === null && response.data.visibility !== 'direct') {
         insertIfOnline('home');

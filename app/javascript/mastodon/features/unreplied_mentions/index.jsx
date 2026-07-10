@@ -1,9 +1,11 @@
 // momodo: "답장 안 한 메시지" — among my 100 most recent incoming mentions,
-// the ones I have not directly replied to, rendered as real statuses so the
-// reply button works right here. Re-fetches on every visit (no pagination —
-// the window is capped at 100 server-side).
+// the ones I have not handled yet (replied to / favourited / boosted),
+// rendered as real statuses so those buttons work right here. Handling a
+// status removes it from the list LIVE (store-derived filter); the server
+// applies the same criteria on the next fetch. No pagination — the window
+// is capped at 100 server-side.
 import PropTypes from 'prop-types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 
@@ -11,7 +13,9 @@ import { Helmet } from '@unhead/react/helmet';
 
 import { List as ImmutableList } from 'immutable';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { me } from 'mastodon/initial_state';
 
 import MarkEmailUnreadIcon from '@/material-icons/400-24px/mark_email_unread.svg?react';
 import { importFetchedStatuses } from 'mastodon/actions/importer';
@@ -43,6 +47,34 @@ const UnrepliedMentions = ({ multiColumn }) => {
     reload();
   }, [reload]);
 
+  // live removal: drop items the user just handled (reply / favourite /
+  // boost) without waiting for a refetch
+  const statuses = useSelector((state) => state.get('statuses'));
+
+  const visibleIds = useMemo(() => {
+    if (statusIds === null) {
+      return null;
+    }
+
+    const repliedToByMe = new Set();
+
+    statuses.forEach((status) => {
+      if (status.get('account') === me && status.get('in_reply_to_id')) {
+        repliedToByMe.add(String(status.get('in_reply_to_id')));
+      }
+    });
+
+    return statusIds.filter((id) => {
+      const status = statuses.get(id);
+
+      if (!status) {
+        return true;
+      }
+
+      return !status.get('favourited') && !status.get('reblogged') && !repliedToByMe.has(id);
+    });
+  }, [statuses, statusIds]);
+
   return (
     <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.heading)}>
       <ColumnHeader
@@ -55,9 +87,9 @@ const UnrepliedMentions = ({ multiColumn }) => {
 
       <StatusList
         trackScroll={!multiColumn}
-        statusIds={statusIds || ImmutableList()}
+        statusIds={visibleIds || ImmutableList()}
         scrollKey='unreplied_mentions'
-        isLoading={statusIds === null}
+        isLoading={visibleIds === null}
         bindToDocument={!multiColumn}
         emptyMessage={<FormattedMessage id='unreplied_mentions.empty' defaultMessage='Nothing here — you have replied to all of your recent 100 mentions.' />}
       />

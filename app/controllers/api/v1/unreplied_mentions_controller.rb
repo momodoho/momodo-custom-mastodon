@@ -2,7 +2,8 @@
 
 # momodo: "답장 안 한 메시지" — among the RECENT_LIMIT most recent statuses that
 # mention the current account (others' posts only), return the ones the account
-# has not directly replied to. No pagination by design: the window is capped.
+# has not handled yet. "Handled" = directly replied to, favourited, or boosted.
+# No pagination by design: the window is capped.
 class Api::V1::UnrepliedMentionsController < Api::BaseController
   before_action -> { doorkeeper_authorize! :read, :'read:statuses' }
   before_action :require_user!
@@ -24,8 +25,10 @@ class Api::V1::UnrepliedMentionsController < Api::BaseController
                         .limit(RECENT_LIMIT)
                         .pluck(:status_id)
 
-    replied_ids = current_account.statuses.where(in_reply_to_id: recent_ids).reorder(nil).distinct.pluck(:in_reply_to_id)
+    handled_ids  = current_account.statuses.where(in_reply_to_id: recent_ids).reorder(nil).distinct.pluck(:in_reply_to_id)
+    handled_ids |= current_account.favourites.where(status_id: recent_ids).pluck(:status_id)
+    handled_ids |= current_account.statuses.where(reblog_of_id: recent_ids).reorder(nil).distinct.pluck(:reblog_of_id)
 
-    Status.where(id: recent_ids - replied_ids).order(id: :desc)
+    Status.where(id: recent_ids - handled_ids).order(id: :desc)
   end
 end
