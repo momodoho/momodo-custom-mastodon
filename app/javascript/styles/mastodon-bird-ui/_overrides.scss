@@ -33,6 +33,11 @@
   background-size: 32px auto !important;
 }
 
+// Breathing room between the logo and the menu list (they sat flush together).
+.navigation-panel .navigation-panel__menu {
+  margin-top: 16px !important;
+}
+
 // Fixed navigation order for the Twitter-style theme (momodo fixed order):
 // Home, Notifications, Direct, Live feed, Bookmarks, Favourites, Lists,
 // Preferences, Account switcher.
