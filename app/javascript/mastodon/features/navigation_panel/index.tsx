@@ -346,6 +346,16 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
             <li>
               <ColumnLink
                 transparent
+                to='/scheduled_statuses'
+                icon='clock-o'
+                iconComponent={ScheduleIcon}
+                text={intl.formatMessage(messages.scheduledStatuses)}
+              />
+            </li>
+
+            <li>
+              <ColumnLink
+                transparent
                 to='/favourites'
                 icon='star'
                 iconComponent={StarIcon}
@@ -380,15 +390,6 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
                 iconComponent={GroupsIcon}
                 activeIconComponent={GroupsActiveIcon}
                 text={intl.formatMessage(messages.rooms)}
-              />
-            </li>
-            <li>
-              <ColumnLink
-                transparent
-                to='/scheduled_statuses'
-                icon='clock-o'
-                iconComponent={ScheduleIcon}
-                text={intl.formatMessage(messages.scheduledStatuses)}
               />
             </li>
 

@@ -43,6 +43,7 @@
 .navigation-panel__menu > li:has(a[href="/bookmarks"]) { order: 5 !important; }
 .navigation-panel__menu > li:has(a[href="/favourites"]) { order: 6 !important; }
 .navigation-panel__menu > li:has(a[href="/lists"]) { order: 7 !important; }
+.navigation-panel__menu > li:has(a[href="/scheduled_statuses"]) { order: 7 !important; } // 리스트 바로 아래(DOM 후순위)
 .navigation-panel__menu > li:has(a[href="/settings/preferences"]) { order: 8 !important; }
 .navigation-panel__menu > li:has(#account-switcher-link) { order: 9 !important; }
 
@@ -69,4 +70,21 @@
     font-size: var(--font-size-mid);
     font-weight: 500;
   }
+}
+
+
+// Show the scheduled-messages nav icon — Bird UI hides unknown nav icons
+// (same treatment as the account switcher above).
+.column-link[href="/scheduled_statuses"] .icon {
+  width: 22px;
+  height: 22px;
+  background-image: none !important;
+}
+
+.column-link[href="/scheduled_statuses"] .icon,
+.column-link[href="/scheduled_statuses"] .icon path {
+  display: block !important;
+  fill: currentColor !important;
+  color: inherit;
+  opacity: 1;
 }
