@@ -16,6 +16,10 @@ on:
 jobs:
   analyze:
     name: Analyze
+    # momodo: code scanning needs Advanced Security, which private forks don't
+    # have — without this guard every scheduled run fails and sends mail
+    # (same guard upstream uses on build-nightly/crowdin/rebase-needed)
+    if: github.repository == 'mastodon/mastodon'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
