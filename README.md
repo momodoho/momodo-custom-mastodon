@@ -138,4 +138,4 @@ cd live && git checkout main
 
 ## 원본과 라이선스
 
-[Mastodon](https://github.com/mastodon/mastodon)의 포크이며, 라이선스는 원본과 같은 AGPL-3.0입니다. 전문은 [LICENSE](LICENSE)를 참고하세요.
+[Mastodon](https://github.com/mastodon/mastodon)의 포크입니다. 라이선스는 원본 마스토돈과 동일한 AGPL-3.0입니다. 전문은 [LICENSE](LICENSE)를 참고해주세요. 해당 버전의 수정은 자유로우며, 커미션을 받는 것 또한 자유롭습니다. 수정한 소스의 경우 Mastodon 원본의 라이선스에 따라 무료 전체 공개를 원칙으로 합니다.
