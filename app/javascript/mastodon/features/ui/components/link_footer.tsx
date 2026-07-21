@@ -77,34 +77,19 @@ export const LinkFooter: React.FC<{
           )}
         </ul>
       </section>
+      {/* momodo: version links to upstream Mastodon, source link goes to the
+          public fork repo, plus the domain this instance runs on */}
       <section>
-        <h2 className={classes.heading}>Mastodon:</h2>
+        <h2 className={classes.heading}>momodo-Mastodon:</h2>
         <ul className={classes.list}>
-          <li>
-            <a href='https://joinmastodon.org' target='_blank' rel='noopener'>
-              <FormattedMessage id='footer.about' defaultMessage='About' />
-              <span className='sr-only'> Mastodon</span>
-            </a>
-          </li>
-          <li>
+          <li className={classes.version}>
             <a
-              href='https://joinmastodon.org/apps'
+              href='https://github.com/mastodon/mastodon'
               target='_blank'
               rel='noopener'
             >
-              <FormattedMessage
-                id='footer.get_app'
-                defaultMessage='Get the app'
-              />
+              v{version}
             </a>
-          </li>
-          <li>
-            <Link to='/keyboard-shortcuts'>
-              <FormattedMessage
-                id='footer.keyboard_shortcuts'
-                defaultMessage='Keyboard shortcuts'
-              />
-            </Link>
           </li>
           <li>
             <a href={source_url} rel='noopener' target='_blank'>
@@ -114,7 +99,11 @@ export const LinkFooter: React.FC<{
               />
             </a>
           </li>
-          <li className={classes.version}>v{version}</li>
+          <li>
+            <a href={`https://${domain}`} rel='noopener'>
+              {domain}
+            </a>
+          </li>
         </ul>
       </section>
     </footer>
