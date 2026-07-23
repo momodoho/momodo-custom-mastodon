@@ -1,10 +1,15 @@
-# momodo
+<div align="center">
 
-자캐 교류 커뮤니티를 돌리기 위해 마스토돈을 손본 버전입니다. 트위터를 쓰던 사람들이 낯설지 않게, 그리고 커뮤니티 안에서 쓴 글이 바깥으로 새지 않게. 이 두 가지가 목표였고 나머지 수정사항은 대부분 여기서 따라 나온 것들입니다.
+![MOMODO-MASTODON](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,17,24&height=190&text=%3E%3E%20MOMODO-MASTODON%20%3C%3C&fontSize=40&fontColor=ffffff&animation=fadeIn&fontAlignY=38)
 
-특정 서버를 운영하려고 만든 것을 코드만 공개해 둔 것이라 아무 서버에나 바로 얹는 범용 배포판은 아닙니다. 다만 같은 목적의 소규모 폐쇄 커뮤니티라면 그대로 가져다 써도 됩니다.
+[![Base](https://img.shields.io/badge/base-Mastodon%20v4.6-6364ff)](https://github.com/mastodon/mastodon)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-8957e5)](LICENSE)
 
-원본 마스토돈이 궁금하면 [공식 저장소](https://github.com/mastodon/mastodon)를 참고하세요. 이 문서는 원본과 무엇이 다른지만 다룹니다.
+</div>
+
+자캐커뮤 및 타임라인식 TRPG 세션을 위하여 개조된 마스토돈 소스입니다. 약 50명 내외의 작은 규모를 대상으로 개조되었으며, 커뮤 러닝을 위한 각종 편의 기능이 추가되었습니다.
+
+원본 마스토돈이 궁금하면 [공식 저장소](https://github.com/mastodon/mastodon)를 참고하세요. 해당 문서는 마스토돈 순정판에서 추가/수정이 된 부분만 정리하여 명시합니다.
 
 ---
 
