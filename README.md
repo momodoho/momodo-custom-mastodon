@@ -2,7 +2,8 @@
 
 # MOMODO-MASTODON
 
-**[Mastodon v4.6](https://github.com/mastodon/mastodon) 기반 · [AGPL-3.0](LICENSE)**
+[![Mastodon v4.6 기반](https://img.shields.io/badge/Mastodon-v4.6%20%EA%B8%B0%EB%B0%98-6364FF?logo=mastodon&logoColor=white)](https://github.com/mastodon/mastodon)
+[![License AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-555?logo=gnu&logoColor=white)](LICENSE)
 
 </div>
 
