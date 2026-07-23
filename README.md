@@ -1,6 +1,6 @@
 <div align="center">
 
-# ${\color{#8957e5}\Huge\textsf{>>\ MOMODO-MASTODON\ <<}}$
+# MOMODO-MASTODON
 
 **[Mastodon v4.6](https://github.com/mastodon/mastodon) 기반 · [AGPL-3.0](LICENSE)**
 
