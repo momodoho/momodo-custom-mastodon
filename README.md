@@ -1,9 +1,8 @@
 <div align="center">
 
-![MOMODO-MASTODON](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,17,24&height=190&text=%3E%3E%20MOMODO-MASTODON%20%3C%3C&fontSize=40&fontColor=ffffff&animation=fadeIn&fontAlignY=38)
+# ${\color{#8957e5}\Huge\textsf{>>\ MOMODO-MASTODON\ <<}}$
 
-[![Base](https://img.shields.io/badge/base-Mastodon%20v4.6-6364ff)](https://github.com/mastodon/mastodon)
-[![License](https://img.shields.io/badge/license-AGPL--3.0-8957e5)](LICENSE)
+**[Mastodon v4.6](https://github.com/mastodon/mastodon) 기반 · [AGPL-3.0](LICENSE)**
 
 </div>
 
