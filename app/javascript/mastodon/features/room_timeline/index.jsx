@@ -13,7 +13,7 @@ import { injectIntl } from '@/mastodon/components/intl';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import { openModal } from 'mastodon/actions/modal';
-import { fetchRoom, fetchRooms, leaveRoom } from 'mastodon/actions/rooms';
+import { fetchRoom, fetchRooms, leaveRoom, destroyRoom } from 'mastodon/actions/rooms';
 import { Icon } from 'mastodon/components/icon';
 import { connectRoomStream } from 'mastodon/actions/streaming';
 import { expandRoomTimeline } from 'mastodon/actions/timelines';
@@ -30,6 +30,10 @@ const messages = defineMessages({
   leaveTitle: { id: 'rooms.leave.title', defaultMessage: 'Leave room' },
   leaveMessage: { id: 'rooms.leave.message', defaultMessage: 'Leave this room? You will no longer see its messages or be able to post here. Posts you already wrote stay in the room.' },
   leaveConfirm: { id: 'rooms.leave.confirm', defaultMessage: 'Leave' },
+  destroyTitle: { id: 'rooms.destroy.title', defaultMessage: 'Leave and delete room' },
+  destroyMessage: { id: 'rooms.destroy.message', defaultMessage: 'You own this room, so leaving deletes it. Every member is removed and every message in the room is permanently erased. This cannot be undone.' },
+  destroyConfirm: { id: 'rooms.destroy.confirm', defaultMessage: 'Delete room' },
+  destroyed: { id: 'rooms.destroyed.title', defaultMessage: 'Room deleted' },
 });
 
 const mapStateToProps = (state, props) => ({
@@ -55,17 +59,21 @@ class RoomTimeline extends PureComponent {
   };
 
   handleLeave = () => {
-    const { dispatch, history, intl } = this.props;
+    const { dispatch, history, intl, room } = this.props;
     const { id } = this.props.params;
+
+    // The owner cannot walk out and leave the room behind: their exit blows it
+    // up, so they get a heavier warning and a different confirm label.
+    const isOwner = !!(room && room.get && room.get('owner'));
 
     dispatch(openModal({
       modalType: 'CONFIRM',
       modalProps: {
-        title: intl.formatMessage(messages.leaveTitle),
-        message: intl.formatMessage(messages.leaveMessage),
-        confirm: intl.formatMessage(messages.leaveConfirm),
+        title: intl.formatMessage(isOwner ? messages.destroyTitle : messages.leaveTitle),
+        message: intl.formatMessage(isOwner ? messages.destroyMessage : messages.leaveMessage),
+        confirm: intl.formatMessage(isOwner ? messages.destroyConfirm : messages.leaveConfirm),
         onConfirm: () => {
-          dispatch(leaveRoom(id))
+          dispatch(isOwner ? destroyRoom(id) : leaveRoom(id))
             .then(() => {
               dispatch(fetchRooms());
               history.push('/rooms');
@@ -121,9 +129,8 @@ class RoomTimeline extends PureComponent {
 
 
   render () {
-    const { hasUnread, multiColumn, room } = this.props;
+    const { hasUnread, intl, multiColumn, room } = this.props;
     const { id } = this.props.params;
-    const title = room ? room.get('title') : id;
 
     if (typeof room === 'undefined') {
       return (
@@ -137,7 +144,36 @@ class RoomTimeline extends PureComponent {
       return (
         <BundleColumnError multiColumn={multiColumn} errorType='routing' />
       );
+    } else if (room.get('deleted')) {
+      // The owner blew the room up while we had it open (or we just did it
+      // ourselves) — say so instead of leaving a dead timeline on screen.
+      return (
+        <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.destroyed)}>
+          <ColumnHeader
+            icon='users'
+            iconComponent={GroupsIcon}
+            title={intl.formatMessage(messages.destroyed)}
+            multiColumn={multiColumn}
+            showBackButton
+          />
+
+          <div className='empty-column-indicator'>
+            <FormattedMessage id='rooms.destroyed.explanation' defaultMessage='The owner left this room, so the room and all of its messages are gone.' />
+            {' '}
+            <Link to='/rooms'>
+              <FormattedMessage id='rooms.destroyed.back' defaultMessage='Back to group messages' />
+            </Link>
+          </div>
+
+          <Helmet>
+            <title>{intl.formatMessage(messages.destroyed)}</title>
+            <meta name='robots' content='noindex' />
+          </Helmet>
+        </Column>
+      );
     }
+
+    const title = room.get('title');
 
     const isMember = room.get('member');
     const isOwner = room.get('owner');
@@ -162,10 +198,15 @@ class RoomTimeline extends PureComponent {
               </Link>
             )}
 
-            {/* The owner manages the room and cannot leave (it would strand it). */}
-            {isMember && !isOwner && (
+            {/* The owner may leave too — but their exit deletes the room, so
+                the button says what it really does. */}
+            {isMember && (
               <button type='button' className='button button-secondary' onClick={this.handleLeave}>
-                <FormattedMessage id='rooms.leave.action' defaultMessage='Leave room' />
+                {isOwner ? (
+                  <FormattedMessage id='rooms.destroy.action' defaultMessage='Leave and delete room' />
+                ) : (
+                  <FormattedMessage id='rooms.leave.action' defaultMessage='Leave room' />
+                )}
               </button>
             )}
           </div>

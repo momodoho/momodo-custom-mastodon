@@ -263,7 +263,7 @@ namespace :api, format: false do
       resource :accounts, only: [:show, :create, :destroy], module: :lists
     end
 
-    resources :rooms, only: [:index, :create, :show, :update] do
+    resources :rooms, only: [:index, :create, :show, :update, :destroy] do
       member do
         post :join
         post :leave

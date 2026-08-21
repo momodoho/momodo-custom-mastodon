@@ -29,7 +29,11 @@ class Room < ApplicationRecord
 
   has_many :memberships, class_name: 'RoomMembership', inverse_of: :room, dependent: :destroy
   has_many :members, through: :memberships, source: :account
-  has_many :statuses, inverse_of: :room, dependent: :nullify
+  # Destroying a room takes its posts with it: a room post only ever existed
+  # inside the room, and orphaning one (room_id => NULL) would let it resurface
+  # on its author's own profile. Bulk destruction goes through
+  # DestroyRoomService / RoomDestroyWorker; this is the safety net.
+  has_many :statuses, inverse_of: :room, dependent: :destroy
 
   validates :title, presence: true, length: { maximum: TITLE_LENGTH_LIMIT }
 

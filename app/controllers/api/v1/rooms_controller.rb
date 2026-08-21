@@ -42,16 +42,29 @@ class Api::V1::RoomsController < Api::BaseController
     render json: @room, serializer: REST::RoomSerializer
   end
 
-  # Any member may leave on their own. The owner cannot (it would strand the
-  # room with no manager); they keep the room or it must be removed by an admin.
+  # Any member may leave on their own. The owner leaving is special: a room
+  # cannot outlive its manager, so the owner walking out destroys ("폭파") the
+  # room for everyone instead of stranding it — see #destroy.
   def leave
-    raise Mastodon::NotPermittedError if @room.owner?(current_account)
+    return destroy_room! if @room.owner?(current_account)
 
     @room.memberships.find_by(account: current_account)&.destroy
     render json: @room, serializer: REST::RoomSerializer
   end
 
+  # Explicit "blow up the room" for clients that want to say so out loud.
+  # Same effect as the owner leaving.
+  def destroy
+    authorize_owner!
+    destroy_room!
+  end
+
   private
+
+  def destroy_room!
+    DestroyRoomService.new.call(@room)
+    render json: @room, serializer: REST::RoomSerializer
+  end
 
   def set_room
     @room = Room.find(params[:id])

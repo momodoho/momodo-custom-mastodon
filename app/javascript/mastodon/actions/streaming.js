@@ -12,6 +12,7 @@ import {
 import { updateConversations } from './conversations';
 import { processNewNotificationForGroups, refreshStaleNotificationGroups, pollRecentNotifications as pollRecentGroupNotifications } from './notification_groups';
 import { updateNotifications } from './notifications';
+import { roomDestroyed } from './rooms';
 import { updateStatus } from './statuses';
 import {
   updateTimeline,
@@ -108,6 +109,11 @@ export const connectTimelineStream = (timelineId, channelName, params = {}, opti
           break;
         case 'delete':
           dispatch(deleteFromTimelines(data.payload));
+          break;
+        // momodo: only the room channel emits this — the owner left, so the
+        // room (and everything in it) is gone for every member.
+        case 'room.destroyed':
+          dispatch(roomDestroyed(data.payload));
           break;
         case 'notification': {
           // @ts-expect-error

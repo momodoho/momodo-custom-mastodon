@@ -4,6 +4,7 @@ import {
   ROOMS_FETCH_SUCCESS,
   ROOM_FETCH_SUCCESS,
   ROOM_FETCH_FAIL,
+  ROOM_DESTROYED,
 } from '../actions/rooms';
 
 const initialState = ImmutableMap();
@@ -26,6 +27,10 @@ export default function rooms(state = initialState, action) {
     return normalizeRoom(state, action.room);
   case ROOM_FETCH_FAIL:
     return state.set(action.id, false);
+  // Kept as a tombstone rather than removed, so a member who has the room open
+  // can be told it was blown up instead of staring at a stale timeline.
+  case ROOM_DESTROYED:
+    return state.set(action.id, ImmutableMap({ id: action.id, deleted: true }));
   default:
     return state;
   }
