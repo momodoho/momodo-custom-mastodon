@@ -17,7 +17,7 @@ module BrandingOverridesHelper
       css << bg
       # When an app background is set, make the timeline column translucent so the
       # background shows through (inner surfaces transparent to avoid compounding).
-      css << timeline_opacity_rules unless bg.blank?
+      css << timeline_opacity_rules if bg.present?
     else
       css << momodo_background_css('body', brand_key(:login_bg, :light), brand_key(:login_bg, :dark))
     end

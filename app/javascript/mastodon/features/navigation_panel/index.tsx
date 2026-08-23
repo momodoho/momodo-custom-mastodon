@@ -10,13 +10,10 @@ import type { Map as ImmutableMap } from 'immutable';
 import { animated, useSpring } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 
-import { useAccount } from '@/mastodon/hooks/useAccount';
 import AddIcon from '@/material-icons/400-24px/add.svg?react';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import BookmarksActiveIcon from '@/material-icons/400-24px/bookmarks-fill.svg?react';
 import BookmarksIcon from '@/material-icons/400-24px/bookmarks.svg?react';
-import CollectionsActiveIcon from '@/material-icons/400-24px/category-fill.svg?react';
-import CollectionsIcon from '@/material-icons/400-24px/category.svg?react';
 import GroupsActiveIcon from '@/material-icons/400-24px/groups-fill.svg?react';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import ScheduleIcon from '@/material-icons/400-24px/schedule.svg?react';
@@ -58,7 +55,6 @@ import { useAppSelector, useAppDispatch } from 'mastodon/store';
 import { AnnualReportNavItem } from '../annual_report/nav_item';
 
 import { DisabledAccountBanner } from './components/disabled_account_banner';
-import { FollowedTagsPanel } from './components/followed_tags_panel';
 import { ListPanel } from './components/list_panel';
 import { SignInBanner } from './components/sign_in_banner';
 import { Trends } from './components/trends';
@@ -225,7 +221,6 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
   const { signedIn, permissions, disabledAccountId } = useIdentity();
   const location = useLocation();
   const showSearch = useBreakpoint('full') && !multiColumn;
-  const account = useAccount(me);
 
   let banner: React.ReactNode;
 
@@ -453,7 +448,7 @@ export const CollapsibleNavigationPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const openable = useBreakpoint('openable');
   const location = useLocation();
-  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     dispatch(closeNavigation());
@@ -492,7 +487,7 @@ export const CollapsibleNavigationPanel: React.FC = () => {
         x({ value }: { value: number }) {
           if (value === 0) {
             dispatch(openNavigation());
-          } else if (isLtrDir ? value > 0 : value < 0) {
+          } else if (value === OPEN_MENU_OFFSET) {
             dispatch(closeNavigation());
           }
         },
@@ -532,6 +527,7 @@ export const CollapsibleNavigationPanel: React.FC = () => {
     },
     {
       from: () => [x.get(), 0],
+      axis: 'x',
       filterTaps: true,
       bounds: isLtrDir ? { left: 0 } : { right: 0 },
       rubberband: true,
@@ -539,7 +535,7 @@ export const CollapsibleNavigationPanel: React.FC = () => {
     },
   );
 
-  const previouslyFocusedElementRef = useRef<HTMLElement | null>();
+  const previouslyFocusedElementRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (open) {

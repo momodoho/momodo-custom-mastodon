@@ -692,8 +692,10 @@ export const updateAccount = ({ displayName, note, avatar, header, discoverable,
   data.append('note', note);
   if (avatar) data.append('avatar', avatar);
   if (header) data.append('header', header);
-  data.append('discoverable', discoverable);
-  data.append('indexable', indexable);
+  // momodo: onboarding leaves discoverability untouched (undefined) — don't
+  // send the literal string "undefined", which Rails would cast to `true`.
+  if (discoverable !== undefined) data.append('discoverable', discoverable);
+  if (indexable !== undefined) data.append('indexable', indexable);
 
   return api().patch('/api/v1/accounts/update_credentials', data).then(response => {
     dispatch(importFetchedAccount(response.data));

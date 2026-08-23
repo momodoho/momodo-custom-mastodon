@@ -56,6 +56,7 @@ class UserSettings
     setting :trends, default: false
     setting :appeal, default: false
     setting :software_updates, default: 'none', in: %w(none critical patch all)
+    setting :end_of_support, default: false # momodo: e-mail notifications off by default (same as the rest)
   end
 
   namespace :interactions do

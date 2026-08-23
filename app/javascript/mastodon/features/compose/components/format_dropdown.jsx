@@ -6,8 +6,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import { defineMessages, useIntl } from 'react-intl';
 
-import Overlay from 'react-overlays/Overlay';
-
+import { Popover } from '@/mastodon/components/popover';
 import CodeIcon from '@/material-icons/400-24px/code.svg?react';
 import FormatBoldIcon from '@/material-icons/400-24px/format_bold.svg?react';
 import FormatItalicIcon from '@/material-icons/400-24px/format_italic.svg?react';
@@ -47,7 +46,7 @@ const iconStyle = {
 
 export const FormatDropdown = ({ onSelect, disabled }) => {
   const intl = useIntl();
-  const overlayTargetRef = useRef(null);
+  const [popoverTarget, setPopoverTarget] = useState(null);
   const previousFocusTargetRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -91,7 +90,7 @@ export const FormatDropdown = ({ onSelect, disabled }) => {
   ];
 
   return (
-    <div ref={overlayTargetRef}>
+    <div ref={setPopoverTarget}>
       <IconButton
         icon='text-format'
         iconComponent={TextFormatIcon}
@@ -106,13 +105,11 @@ export const FormatDropdown = ({ onSelect, disabled }) => {
         style={iconStyle}
       />
 
-      <Overlay
-        show={isOpen}
-        offset={[5, 5]}
-        placement='bottom'
-        flip
-        target={overlayTargetRef}
-        popperConfig={{ strategy: 'fixed' }}
+      <Popover
+        isOpen={isOpen}
+        offset={5}
+        reference={popoverTarget}
+        onClose={handleClose}
       >
         {({ props, placement }) => (
           <div {...props}>
@@ -126,7 +123,7 @@ export const FormatDropdown = ({ onSelect, disabled }) => {
             </div>
           </div>
         )}
-      </Overlay>
+      </Popover>
     </div>
   );
 };

@@ -91,6 +91,13 @@ export const messages = defineMessages({
     id: 'account_edit.custom_fields.tip_title',
     defaultMessage: 'Tip: Adding verified links',
   },
+  // momodo: the "profile display settings" section is removed from this page,
+  // but upstream's ProfileDisplayModal (modals/profile_display_modal.tsx) still
+  // imports this message — keep the key so the modal compiles.
+  profileTabTitle: {
+    id: 'account_edit.profile_tab.title',
+    defaultMessage: 'Profile display settings',
+  },
   advancedSettingsTitle: {
     id: 'account_edit.advanced_settings.title',
     defaultMessage: 'Advanced settings',

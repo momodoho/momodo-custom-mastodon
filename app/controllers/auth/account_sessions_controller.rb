@@ -12,7 +12,7 @@ class Auth::AccountSessionsController < ApplicationController
 
     activate(target) if target&.user
 
-    head :no_content
+    head 204
   end
 
   # Remove a single account from the ring and revoke its session. If it was the
@@ -27,7 +27,7 @@ class Auth::AccountSessionsController < ApplicationController
       activate_remaining_or_logout if was_active
     end
 
-    head :no_content
+    head 204
   end
 
   # Sign out of every account in the ring at once.
@@ -36,7 +36,7 @@ class Auth::AccountSessionsController < ApplicationController
     AccountRing.clear(cookies)
     sign_out(current_user)
 
-    head :no_content
+    head 204
   end
 
   private
@@ -48,7 +48,7 @@ class Auth::AccountSessionsController < ApplicationController
     return if account_id.blank? || ids.blank?
 
     SessionActivation.where(session_id: ids).includes(user: :account)
-                     .find { |session| session.user&.account&.id&.to_s == account_id.to_s }
+      .find { |session| session.user&.account&.id&.to_s == account_id.to_s }
   end
 
   def activate(activation)

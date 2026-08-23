@@ -1,4 +1,4 @@
-# Development image for Mastodon 4.6 (Ruby 4.0.5 + Node 24 + Yarn 4/Berry + Vite).
+# Development image for Mastodon 4.7 (Ruby 4.0.x + Node 24 + Yarn 4/Berry + Vite).
 FROM ruby:4.0.5-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive \

@@ -36,7 +36,7 @@ export const useAccountContextValue = (accountId?: string | null) => {
   const replies = withReplies;
 
   // Filtering is controlled by the tabs, so the setters are no-ops.
-  const noop = useCallback((_value: boolean) => {
+  const noop = useCallback(() => {
     // intentionally empty
   }, []);
 

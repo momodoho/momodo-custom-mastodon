@@ -2,14 +2,13 @@
 // Sets compose.scheduled_at (ISO string); the submit action sends it along and
 // the backend turns the post into a ScheduledStatus (min. 5 minutes ahead).
 import PropTypes from 'prop-types';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { defineMessages, useIntl } from 'react-intl';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import Overlay from 'react-overlays/Overlay';
-
+import { Popover } from '@/mastodon/components/popover';
 import ScheduleIcon from '@/material-icons/400-24px/schedule.svg?react';
 import { changeComposeScheduledAt } from 'mastodon/actions/compose';
 import { IconButton } from 'mastodon/components/icon_button';
@@ -42,7 +41,7 @@ export const ScheduleDropdown = ({ disabled }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const scheduledAt = useSelector((state) => state.getIn(['compose', 'scheduled_at']));
-  const overlayTargetRef = useRef(null);
+  const [popoverTarget, setPopoverTarget] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = useCallback(() => {
@@ -81,7 +80,7 @@ export const ScheduleDropdown = ({ disabled }) => {
   const minValue = toLocalInputValue(new Date(Date.now() + (MINIMUM_OFFSET_MINUTES * 60000)));
 
   return (
-    <div ref={overlayTargetRef}>
+    <div ref={setPopoverTarget}>
       <IconButton
         icon='clock-o'
         iconComponent={ScheduleIcon}
@@ -95,15 +94,11 @@ export const ScheduleDropdown = ({ disabled }) => {
         style={iconStyle}
       />
 
-      <Overlay
-        show={isOpen}
-        offset={[5, 5]}
-        placement='bottom'
-        flip
-        target={overlayTargetRef}
-        popperConfig={{ strategy: 'fixed' }}
-        onHide={handleClose}
-        rootClose
+      <Popover
+        isOpen={isOpen}
+        offset={5}
+        reference={popoverTarget}
+        onClose={handleClose}
       >
         {({ props, placement }) => (
           <div {...props}>
@@ -142,7 +137,7 @@ export const ScheduleDropdown = ({ disabled }) => {
             </div>
           </div>
         )}
-      </Overlay>
+      </Popover>
     </div>
   );
 };

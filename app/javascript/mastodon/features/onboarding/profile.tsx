@@ -129,6 +129,8 @@ export const Profile: React.FC<{
         // momodo: like the 4.2.1 edition, onboarding does not touch
         // discoverability — it stays at the account default (off) and can only
         // be enabled later in Settings → Privacy and reach.
+        discoverable: undefined,
+        indexable: undefined,
       }),
     )
       .then(() => {

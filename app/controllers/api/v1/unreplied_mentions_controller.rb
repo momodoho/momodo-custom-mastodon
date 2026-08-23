@@ -19,11 +19,11 @@ class Api::V1::UnrepliedMentionsController < Api::BaseController
 
   def unreplied_statuses
     recent_ids = Mention.where(account: current_account, silent: false)
-                        .joins(:status)
-                        .where.not(statuses: { account_id: current_account.id })
-                        .order(status_id: :desc)
-                        .limit(RECENT_LIMIT)
-                        .pluck(:status_id)
+      .joins(:status)
+      .where.not(statuses: { account_id: current_account.id })
+      .order(status_id: :desc)
+      .limit(RECENT_LIMIT)
+      .pluck(:status_id)
 
     handled_ids  = current_account.statuses.where(in_reply_to_id: recent_ids).reorder(nil).distinct.pluck(:in_reply_to_id)
     handled_ids |= current_account.favourites.where(status_id: recent_ids).pluck(:status_id)

@@ -111,12 +111,15 @@ RSpec.describe FanOutOnWriteService do
   context 'when status is direct' do
     let(:visibility) { 'direct' }
 
-    it 'is added to the home feed of its author and mentioned followers and does not broadcast', :inline_jobs do
+    # momodo: direct messages are kept out of the home timeline at read time
+    # (app/models/feed.rb), so nobody sees them there — not even the author.
+    it 'is kept out of every home feed and does not broadcast', :inline_jobs do
       subject.call(status)
 
       expect(status.id)
-        .to be_in(home_feed_of(alice))
-        .and be_in(home_feed_of(bob))
+        .to_not be_in(home_feed_of(alice))
+      expect(status.id)
+        .to_not be_in(home_feed_of(bob))
       expect(status.id)
         .to_not be_in(home_feed_of(tom))
 
