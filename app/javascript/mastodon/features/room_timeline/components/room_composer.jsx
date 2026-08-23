@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 
 import AddPhotoIcon from '@/material-icons/400-24px/add_photo_alternate.svg?react';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
+import SendIcon from '@/material-icons/400-24px/send.svg?react';
 import { submitRoomStatus } from 'mastodon/actions/rooms';
 import api from 'mastodon/api';
 import { Icon } from 'mastodon/components/icon';
@@ -27,6 +28,7 @@ export const RoomComposer = ({ roomId }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const fileRef = useRef(null);
+  const textareaRef = useRef(null);
   const [text, setText] = useState('');
   const [media, setMedia] = useState([]); // { id, preview }
   const [uploading, setUploading] = useState(false);
@@ -89,6 +91,10 @@ export const RoomComposer = ({ roomId }) => {
       .then(() => {
         setText('');
         setMedia([]);
+        if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+          textareaRef.current.focus();
+        }
         return undefined;
       })
       .catch(() => undefined)
@@ -106,46 +112,15 @@ export const RoomComposer = ({ roomId }) => {
 
   const canSend = !submitting && !uploading && (text.trim().length > 0 || media.length > 0);
 
+  const handleInput = useCallback((e) => {
+    setText(e.target.value);
+    // auto-grow like a chat box (up to a few lines)
+    e.target.style.height = 'auto';
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`;
+  }, []);
+
   return (
     <div className='room-composer'>
-      <textarea
-        className='room-composer__textarea'
-        placeholder={intl.formatMessage(messages.placeholder)}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onKeyDown={handleKeyDown}
-        rows={2}
-        disabled={submitting}
-      />
-
-      <button
-        type='button'
-        className='room-composer__attach'
-        title={intl.formatMessage(messages.attach)}
-        onClick={() => fileRef.current?.click()}
-        disabled={media.length >= MAX_IMAGES || uploading || submitting}
-      >
-        <Icon id='image' icon={AddPhotoIcon} />
-      </button>
-
-      <button
-        type='button'
-        className='button room-composer__send'
-        onClick={handleSubmit}
-        disabled={!canSend}
-      >
-        {intl.formatMessage(messages.send)}
-      </button>
-
-      <input
-        ref={fileRef}
-        type='file'
-        accept='image/*'
-        multiple
-        style={{ display: 'none' }}
-        onChange={handleFiles}
-      />
-
       {(media.length > 0 || uploading) && (
         <div className='room-composer__thumbs'>
           {media.map((m) => (
@@ -164,6 +139,52 @@ export const RoomComposer = ({ roomId }) => {
           {uploading && <span className='room-composer__thumb room-composer__thumb--loading' />}
         </div>
       )}
+
+      <div className='room-composer__row'>
+        <button
+          type='button'
+          className='room-composer__attach'
+          title={intl.formatMessage(messages.attach)}
+          aria-label={intl.formatMessage(messages.attach)}
+          onClick={() => fileRef.current?.click()}
+          disabled={media.length >= MAX_IMAGES || uploading || submitting}
+        >
+          <Icon id='image' icon={AddPhotoIcon} />
+        </button>
+
+        <div className='room-composer__field'>
+          <textarea
+            ref={textareaRef}
+            className='room-composer__textarea'
+            placeholder={intl.formatMessage(messages.placeholder)}
+            value={text}
+            onChange={handleInput}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            disabled={submitting}
+          />
+        </div>
+
+        <button
+          type='button'
+          className='room-composer__send'
+          title={intl.formatMessage(messages.send)}
+          aria-label={intl.formatMessage(messages.send)}
+          onClick={handleSubmit}
+          disabled={!canSend}
+        >
+          <Icon id='send' icon={SendIcon} />
+        </button>
+      </div>
+
+      <input
+        ref={fileRef}
+        type='file'
+        accept='image/*'
+        multiple
+        style={{ display: 'none' }}
+        onChange={handleFiles}
+      />
     </div>
   );
 };

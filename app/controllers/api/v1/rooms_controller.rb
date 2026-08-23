@@ -8,7 +8,8 @@ class Api::V1::RoomsController < Api::BaseController
   before_action :set_room, except: [:index, :create]
 
   def index
-    @rooms = Room.with_member(current_account).order(id: :desc)
+    # momodo: newest activity first (DM-style list)
+    @rooms = Room.with_member(current_account).preload(:memberships).to_a.sort_by { |r| -(r.statuses.reorder(id: :desc).pick(:id) || r.id) }
     render json: @rooms, each_serializer: REST::RoomSerializer
   end
 

@@ -10,20 +10,22 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
 import { injectIntl } from '@/mastodon/components/intl';
-import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
+import ArrowBackIcon from '@/material-icons/400-24px/arrow_back.svg?react';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
+import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
+import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
 import { openModal } from 'mastodon/actions/modal';
 import { fetchRoom, fetchRooms, leaveRoom, destroyRoom } from 'mastodon/actions/rooms';
 import { Icon } from 'mastodon/components/icon';
 import { connectRoomStream } from 'mastodon/actions/streaming';
 import { expandRoomTimeline } from 'mastodon/actions/timelines';
-import Column from 'mastodon/components/column';
-import ColumnHeader from 'mastodon/components/column_header';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
+import { RoomAvatar } from 'mastodon/features/rooms/components/room_avatar';
+import { RoomsShell } from 'mastodon/features/rooms/components/rooms_shell';
 import BundleColumnError from 'mastodon/features/ui/components/bundle_column_error';
-import StatusListContainer from 'mastodon/features/ui/containers/status_list_container';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
+import { RoomChat } from './components/room_chat';
 import { RoomComposer } from './components/room_composer';
 
 const messages = defineMessages({
@@ -34,11 +36,14 @@ const messages = defineMessages({
   destroyMessage: { id: 'rooms.destroy.message', defaultMessage: 'You own this room, so leaving deletes it. Every member is removed and every message in the room is permanently erased. This cannot be undone.' },
   destroyConfirm: { id: 'rooms.destroy.confirm', defaultMessage: 'Delete room' },
   destroyed: { id: 'rooms.destroyed.title', defaultMessage: 'Room deleted' },
+  back: { id: 'rooms.back', defaultMessage: 'Back' },
+  manage: { id: 'rooms.manage_members', defaultMessage: 'Invite / manage members' },
+  leave: { id: 'rooms.leave.action', defaultMessage: 'Leave room' },
+  destroy: { id: 'rooms.destroy.action', defaultMessage: 'Leave and delete room' },
 });
 
 const mapStateToProps = (state, props) => ({
   room: state.getIn(['rooms', props.params.id]),
-  hasUnread: state.getIn(['timelines', `room:${props.params.id}`, 'unread']) > 0,
 });
 
 class RoomTimeline extends PureComponent {
@@ -47,15 +52,8 @@ class RoomTimeline extends PureComponent {
     params: PropTypes.object.isRequired,
     dispatch: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
-    columnId: PropTypes.string,
-    hasUnread: PropTypes.bool,
-    multiColumn: PropTypes.bool,
     room: PropTypes.oneOfType([ImmutablePropTypes.map, PropTypes.bool]),
     ...WithRouterPropTypes,
-  };
-
-  handleHeaderClick = () => {
-    this.column.scrollTop();
   };
 
   handleLeave = () => {
@@ -118,10 +116,6 @@ class RoomTimeline extends PureComponent {
     }
   }
 
-  setRef = c => {
-    this.column = c;
-  };
-
   handleLoadMore = maxId => {
     const { id } = this.props.params;
     this.props.dispatch(expandRoomTimeline(id, { maxId }));
@@ -129,38 +123,31 @@ class RoomTimeline extends PureComponent {
 
 
   render () {
-    const { hasUnread, intl, multiColumn, room } = this.props;
+    const { intl, room } = this.props;
     const { id } = this.props.params;
 
     if (typeof room === 'undefined') {
       return (
-        <Column>
-          <div className='scrollable'>
-            <LoadingIndicator />
-          </div>
-        </Column>
+        <RoomsShell pane='chat' activeId={id}>
+          <div className='room-chat__loading'><LoadingIndicator /></div>
+        </RoomsShell>
       );
     } else if (room === false) {
       return (
-        <BundleColumnError multiColumn={multiColumn} errorType='routing' />
+        <BundleColumnError errorType='routing' />
       );
     } else if (room.get('deleted')) {
       // The owner blew the room up while we had it open (or we just did it
       // ourselves) — say so instead of leaving a dead timeline on screen.
       return (
-        <Column bindToDocument={!multiColumn} ref={this.setRef} label={intl.formatMessage(messages.destroyed)}>
-          <ColumnHeader
-            icon='users'
-            iconComponent={GroupsIcon}
-            title={intl.formatMessage(messages.destroyed)}
-            multiColumn={multiColumn}
-            showBackButton
-          />
-
-          <div className='empty-column-indicator'>
-            <FormattedMessage id='rooms.destroyed.explanation' defaultMessage='The owner left this room, so the room and all of its messages are gone.' />
-            {' '}
-            <Link to='/rooms'>
+        <RoomsShell pane='chat' activeId={id}>
+          <div className='rooms-placeholder'>
+            <div className='rooms-placeholder__icon'><Icon id='users' icon={GroupsIcon} /></div>
+            <h2>{intl.formatMessage(messages.destroyed)}</h2>
+            <p>
+              <FormattedMessage id='rooms.destroyed.explanation' defaultMessage='The owner left this room, so the room and all of its messages are gone.' />
+            </p>
+            <Link to='/rooms' className='button rooms-placeholder__button'>
               <FormattedMessage id='rooms.destroyed.back' defaultMessage='Back to group messages' />
             </Link>
           </div>
@@ -169,67 +156,65 @@ class RoomTimeline extends PureComponent {
             <title>{intl.formatMessage(messages.destroyed)}</title>
             <meta name='robots' content='noindex' />
           </Helmet>
-        </Column>
+        </RoomsShell>
       );
     }
 
     const title = room.get('title');
-
     const isMember = room.get('member');
     const isOwner = room.get('owner');
 
     return (
-      <Column bindToDocument={!multiColumn} ref={this.setRef} label={title}>
-        <ColumnHeader
-          icon='users'
-          iconComponent={GroupsIcon}
-          active={hasUnread}
-          title={title}
-          onClick={this.handleHeaderClick}
-          multiColumn={multiColumn}
-        />
+      <RoomsShell pane='chat' activeId={id}>
+        <div className='room-pane'>
+          <header className='room-pane__header'>
+            <Link to='/rooms' className='room-pane__back' title={intl.formatMessage(messages.back)} aria-label={intl.formatMessage(messages.back)}>
+              <Icon id='arrow-left' icon={ArrowBackIcon} />
+            </Link>
 
-        {(isOwner || isMember) && (
-          <div className='room-timeline__manage'>
-            {isOwner && (
-              <Link to={`/rooms/${id}/members`} className='button'>
-                <Icon id='user-plus' icon={PersonAddIcon} />
-                <FormattedMessage id='rooms.manage_members' defaultMessage='Invite / manage members' />
-              </Link>
-            )}
+            <RoomAvatar room={room} size={40} />
 
-            {/* The owner may leave too — but their exit deletes the room, so
-                the button says what it really does. */}
-            {isMember && (
-              <button type='button' className='button button-secondary' onClick={this.handleLeave}>
-                {isOwner ? (
-                  <FormattedMessage id='rooms.destroy.action' defaultMessage='Leave and delete room' />
-                ) : (
-                  <FormattedMessage id='rooms.leave.action' defaultMessage='Leave room' />
-                )}
-              </button>
-            )}
-          </div>
-        )}
+            <div className='room-pane__title'>
+              <h2>{title}</h2>
+              <span className='room-pane__subtitle'>
+                <FormattedMessage
+                  id='rooms.members_count'
+                  defaultMessage='{count, plural, one {# member} other {# members}}'
+                  values={{ count: room.get('members_count') }}
+                />
+              </span>
+            </div>
 
-        {isMember && (
-          <RoomComposer roomId={id} />
-        )}
+            <div className='room-pane__actions'>
+              {isOwner && (
+                <Link to={`/rooms/${id}/members`} className='room-pane__action' title={intl.formatMessage(messages.manage)} aria-label={intl.formatMessage(messages.manage)}>
+                  <Icon id='user-plus' icon={PersonAddIcon} />
+                </Link>
+              )}
+              {isMember && (
+                <button
+                  type='button'
+                  className='room-pane__action room-pane__action--danger'
+                  title={intl.formatMessage(isOwner ? messages.destroy : messages.leave)}
+                  aria-label={intl.formatMessage(isOwner ? messages.destroy : messages.leave)}
+                  onClick={this.handleLeave}
+                >
+                  <Icon id='sign-out' icon={LogoutIcon} />
+                </button>
+              )}
+            </div>
+          </header>
 
-        <StatusListContainer
-          trackScroll
-          scrollKey={`room_timeline-${id}`}
-          timelineId={`room:${id}`}
-          onLoadMore={this.handleLoadMore}
-          emptyMessage={<FormattedMessage id='empty_column.room' defaultMessage='No messages in this room yet. When members post, they will appear here in real time.' />}
-          bindToDocument={!multiColumn}
-        />
+          <RoomChat roomId={id} onLoadMore={this.handleLoadMore} />
+
+          {isMember && <RoomComposer roomId={id} />}
+        </div>
 
         <Helmet>
           <title>{title}</title>
           <meta name='robots' content='noindex' />
         </Helmet>
-      </Column>
+      </RoomsShell>
     );
   }
 

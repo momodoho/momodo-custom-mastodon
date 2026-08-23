@@ -6,7 +6,7 @@ import { useParams, Link } from 'react-router-dom';
 
 import { Helmet } from '@unhead/react/helmet';
 
-import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
+import ArrowBackIcon from '@/material-icons/400-24px/arrow_back.svg?react';
 import { importFetchedAccounts } from 'mastodon/actions/importer';
 import { fetchRoom } from 'mastodon/actions/rooms';
 import {
@@ -16,11 +16,12 @@ import {
 } from 'mastodon/api/rooms';
 import { Avatar } from 'mastodon/components/avatar';
 import { Button } from 'mastodon/components/button';
-import { Column } from 'mastodon/components/column';
-import { ColumnHeader } from 'mastodon/components/column_header';
 import { ColumnSearchHeader } from 'mastodon/components/column_search_header';
 import { DisplayName } from 'mastodon/components/display_name';
+import { Icon } from 'mastodon/components/icon';
+import { LoadingIndicator } from 'mastodon/components/loading_indicator';
 import ScrollableList from 'mastodon/components/scrollable_list';
+import { RoomsShell } from 'mastodon/features/rooms/components/rooms_shell';
 import { useSearchAccounts } from 'mastodon/hooks/useSearchAccounts';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
@@ -29,6 +30,7 @@ const messages = defineMessages({
   placeholder: { id: 'rooms.members.search', defaultMessage: 'Search people to invite' },
   add: { id: 'rooms.members.add', defaultMessage: 'Invite' },
   remove: { id: 'rooms.members.remove', defaultMessage: 'Remove' },
+  back: { id: 'rooms.back', defaultMessage: 'Back' },
 });
 
 // A room member can be anyone (unlike lists, which require following first),
@@ -77,7 +79,7 @@ const AccountItem = ({ accountId, roomId, isMember, isOwner, onToggle }) => {
   );
 };
 
-const RoomMembers = ({ multiColumn }) => {
+const RoomMembers = () => {
   const dispatch = useAppDispatch();
   const { id } = useParams();
   const intl = useIntl();
@@ -125,62 +127,71 @@ const RoomMembers = ({ multiColumn }) => {
   const displayedAccountIds = mode === 'add' && searching ? accountIdsFromSearch : memberIds;
 
   return (
-    <Column bindToDocument={!multiColumn} label={intl.formatMessage(messages.manageMembers)}>
-      <ColumnHeader
-        title={intl.formatMessage(messages.manageMembers)}
-        icon='users'
-        iconComponent={GroupsIcon}
-        multiColumn={multiColumn}
-        showBackButton
-      />
-
-      <ColumnSearchHeader
-        placeholder={intl.formatMessage(messages.placeholder)}
-        onBack={handleDismissSearchClick}
-        onSubmit={handleSearch}
-        onActivate={handleSearchClick}
-        active={mode === 'add'}
-      />
-
-      <ScrollableList
-        scrollKey='room_members'
-        trackScroll={!multiColumn}
-        bindToDocument={!multiColumn}
-        isLoading={loading || loadingSearchResults}
-        showLoading={loading && displayedAccountIds.length === 0}
-        hasMore={false}
-        footer={
-          <div className='column-footer'>
-            <Link to={`/rooms/${id}`} className='button button--block'>
-              <FormattedMessage id='rooms.members.done' defaultMessage='Done' />
-            </Link>
+    <RoomsShell pane='chat' activeId={id}>
+      <div className='room-pane room-members'>
+        <header className='room-pane__header'>
+          <Link to={`/rooms/${id}`} className='room-pane__back room-pane__back--always' title={intl.formatMessage(messages.back)} aria-label={intl.formatMessage(messages.back)}>
+            <Icon id='arrow-left' icon={ArrowBackIcon} />
+          </Link>
+          <div className='room-pane__title'>
+            <h2>{intl.formatMessage(messages.manageMembers)}</h2>
+            {room && room.get && <span className='room-pane__subtitle'>{room.get('title')}</span>}
           </div>
-        }
-        emptyMessage={
-          mode === 'remove' ? (
-            <FormattedMessage id='rooms.members.empty' defaultMessage='Only you so far. Search above to invite people.' tagName='span' />
+        </header>
+
+        <ColumnSearchHeader
+          placeholder={intl.formatMessage(messages.placeholder)}
+          onBack={handleDismissSearchClick}
+          onSubmit={handleSearch}
+          onActivate={handleSearchClick}
+          active={mode === 'add'}
+        />
+
+        <div className='room-members__list'>
+          {loading && displayedAccountIds.length === 0 ? (
+            <div className='room-chat__loading'><LoadingIndicator /></div>
           ) : (
-            <FormattedMessage id='rooms.members.no_results' defaultMessage='No results found.' tagName='span' />
-          )
-        }
-      >
-        {displayedAccountIds.map((accountId) => (
-          <AccountItem
-            key={accountId}
-            accountId={accountId}
-            roomId={id}
-            isOwner={accountId === ownerId}
-            isMember={displayedAccountIds === memberIds || memberIds.includes(accountId)}
-            onToggle={handleToggle}
-          />
-        ))}
-      </ScrollableList>
+            <ScrollableList
+              scrollKey='room_members'
+              trackScroll={false}
+              bindToDocument={false}
+              isLoading={loading || loadingSearchResults}
+              showLoading={false}
+              hasMore={false}
+              emptyMessage={
+                mode === 'remove' ? (
+                  <FormattedMessage id='rooms.members.empty' defaultMessage='Only you so far. Search above to invite people.' tagName='span' />
+                ) : (
+                  <FormattedMessage id='rooms.members.no_results' defaultMessage='No results found.' tagName='span' />
+                )
+              }
+            >
+              {displayedAccountIds.map((accountId) => (
+                <AccountItem
+                  key={accountId}
+                  accountId={accountId}
+                  roomId={id}
+                  isOwner={accountId === ownerId}
+                  isMember={displayedAccountIds === memberIds || memberIds.includes(accountId)}
+                  onToggle={handleToggle}
+                />
+              ))}
+            </ScrollableList>
+          )}
+        </div>
+
+        <div className='room-members__footer'>
+          <Link to={`/rooms/${id}`} className='button button--block'>
+            <FormattedMessage id='rooms.members.done' defaultMessage='Done' />
+          </Link>
+        </div>
+      </div>
 
       <Helmet>
         <title>{intl.formatMessage(messages.manageMembers)}</title>
         <meta name='robots' content='noindex' />
       </Helmet>
-    </Column>
+    </RoomsShell>
   );
 };
 

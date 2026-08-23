@@ -924,27 +924,27 @@ en:
       requires_2fa: Requires two-factor authentication
       title: Roles
     rooms:
-      title: Group messages
-      hint: All group-message rooms on this server. Click a room to view and manage its members.
+      cannot_remove_owner: The room owner cannot be removed.
+      created_at: Created
       empty: No rooms have been created yet.
+      export_csv: Export CSV
+      hint: All group-message rooms on this server. Click a room to view and manage its members.
+      join_policy: Join policy
+      member: Member
+      member_removed: "%{acct} was removed from the room."
+      members: Members
       name: Name
       owner: Owner
-      join_policy: Join policy
-      members: Members
-      created_at: Created
-      export_csv: Export CSV
-      show_hint: Members of this room. Removing a member revokes their access; their existing posts stay in the room.
-      member: Member
-      role: Role
-      role_owner: Owner
-      role_member: Member
-      remove_member: Remove
-      remove_member_confirm: "Remove %{acct} from this room? Their existing posts will remain."
-      cannot_remove_owner: The room owner cannot be removed.
-      member_removed: "%{acct} was removed from the room."
       policy:
         invite: Invite only
         open: Open
+      remove_member: Remove
+      remove_member_confirm: Remove %{acct} from this room? Their existing posts will remain.
+      role: Role
+      role_member: Member
+      role_owner: Owner
+      show_hint: Members of this room. Removing a member revokes their access; their existing posts stay in the room.
+      title: Group messages
     rules:
       add_new: Add rule
       add_translation: Add translation
@@ -968,18 +968,18 @@ en:
         desc: When your users click links to external sites, their browser may send the address of your Mastodon server as the referrer. Disable this if this would uniquely identify your users, e.g. if this is a personal Mastodon server.
         title: Allow external sites to see your Mastodon server as a traffic source
       appearance:
-        preamble: Customize Mastodon's web interface.
-        title: Appearance
+        app_bg_dark: App/timeline background (dark)
+        app_bg_light: App/timeline background (light)
+        brand_theme_birdui: Twitter theme
+        brand_theme_default: Mastodon theme
         branding_uploads: Logo & backgrounds (per theme)
         branding_uploads_hint: Upload a custom logo and login/app background separately for each theme and color scheme. Each slot is independent — a slot you leave empty falls back to the default Mastodon asset (not to the other scheme or theme). Picking a theme above shows only that theme's slots below (the choice also sets the server default theme on save).
-        brand_theme_default: Mastodon theme
-        brand_theme_birdui: Twitter theme
-        logo_light: Logo (light)
-        logo_dark: Logo (dark)
-        login_bg_light: Login background (light)
         login_bg_dark: Login background (dark)
-        app_bg_light: App/timeline background (light)
-        app_bg_dark: App/timeline background (dark)
+        login_bg_light: Login background (light)
+        logo_dark: Logo (dark)
+        logo_light: Logo (light)
+        preamble: Customize Mastodon's web interface.
+        title: Appearance
       branding:
         preamble: Your server's branding differentiates it from other servers in the network. This information may be displayed across a variety of environments, such as Mastodon's web interface, native applications, in link previews on other websites and within messaging apps, and so on. For this reason, it is best to keep this information clear, short and concise.
         title: Branding
@@ -2071,6 +2071,10 @@ en:
       images_only: Only images can be attached in group messages.
       no_scheduling: Room posts cannot be scheduled.
       not_a_member: You are not a member of this room.
+    snippet:
+      image:
+        one: Sent an image
+        other: Sent %{count} images
   rss:
     content_warning: 'Content warning:'
     descriptions:
