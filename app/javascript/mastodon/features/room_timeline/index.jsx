@@ -39,6 +39,7 @@ const messages = defineMessages({
   back: { id: 'rooms.back', defaultMessage: 'Back' },
   manage: { id: 'rooms.manage_members', defaultMessage: 'Invite / manage members' },
   leave: { id: 'rooms.leave.action', defaultMessage: 'Leave room' },
+  members: { id: 'rooms.members.title', defaultMessage: 'Members' },
   destroy: { id: 'rooms.destroy.action', defaultMessage: 'Leave and delete room' },
 });
 
@@ -54,6 +55,13 @@ class RoomTimeline extends PureComponent {
     intl: PropTypes.object.isRequired,
     room: PropTypes.oneOfType([ImmutablePropTypes.map, PropTypes.bool]),
     ...WithRouterPropTypes,
+  };
+
+  handleShowMembers = () => {
+    const { dispatch } = this.props;
+    const { id } = this.props.params;
+
+    dispatch(openModal({ modalType: 'ROOM_MEMBERS', modalProps: { roomId: id } }));
   };
 
   handleLeave = () => {
@@ -176,13 +184,18 @@ class RoomTimeline extends PureComponent {
 
             <div className='room-pane__title'>
               <h2>{title}</h2>
-              <span className='room-pane__subtitle'>
+              <button
+                type='button'
+                className='room-pane__subtitle room-pane__subtitle--button'
+                onClick={this.handleShowMembers}
+                title={intl.formatMessage(messages.members)}
+              >
                 <FormattedMessage
                   id='rooms.members_count'
                   defaultMessage='{count, plural, one {# member} other {# members}}'
                   values={{ count: room.get('members_count') }}
                 />
-              </span>
+              </button>
             </div>
 
             <div className='room-pane__actions'>

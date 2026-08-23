@@ -1249,6 +1249,7 @@
   "rooms.members.no_results": "검색 결과가 없습니다.",
   "rooms.members.remove": "내보내기",
   "rooms.members.search": "초대할 사람 검색",
+  "rooms.members.title": "참여자",
   "rooms.members_count": "{count, plural, other {멤버 #명}}",
   "rooms.new_chat": "새 채팅",
   "rooms.no_results": "검색 결과가 없습니다.",

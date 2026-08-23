@@ -94,6 +94,8 @@ export const MODAL_COMPONENTS = {
   'IGNORE_NOTIFICATIONS': IgnoreNotificationsModal,
   'ANNUAL_REPORT': AnnualReportModal,
   'COMPOSE_PRIVACY': () => Promise.resolve({ default: VisibilityModal }),
+  // momodo: room member list (any member can open it from the room header)
+  'ROOM_MEMBERS': () => import('@/mastodon/features/room_timeline/components/room_members_modal').then(module => ({ default: module.RoomMembersModal })),
   // momodo: Twitter-style reply recipient picker
   'REPLY_MENTIONS': () => import('@/mastodon/features/ui/components/reply_mentions_modal').then(module => ({ default: module.ReplyMentionsModal })),
   'ACCOUNT_NOTE': () => import('@/mastodon/features/account_timeline/modals/note_modal').then(module => ({ default: module.AccountNoteModal })),
