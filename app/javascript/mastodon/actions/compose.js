@@ -4,6 +4,7 @@ import axios from 'axios';
 import { throttle } from 'lodash';
 
 import api from 'mastodon/api';
+import { me } from 'mastodon/initial_state';
 import { browserHistory } from 'mastodon/components/router';
 import { countableText } from 'mastodon/features/compose/util/counter';
 import { tagHistory } from 'mastodon/settings';
@@ -74,9 +75,26 @@ export const COMPOSE_REPLY_MENTIONS_SET_ALL = 'COMPOSE_REPLY_MENTIONS_SET_ALL';
 export const toggleReplyMention = acct => ({ type: COMPOSE_REPLY_MENTION_TOGGLE, acct });
 export const setAllReplyMentions = checked => ({ type: COMPOSE_REPLY_MENTIONS_SET_ALL, checked });
 
+// The recipients we actually show and send. Your own account is never one of
+// them: replying doesn't mention yourself, and an old draft that happens to
+// start with your own handle (edit / redraft / scheduled reload) shouldn't
+// resurrect it either. Filtered here — the single place both the UI and the
+// submitted text read from.
+export const selectReplyMentions = state => {
+  const mentions = state.getIn(['compose', 'reply_mentions']);
+
+  if (!mentions || mentions.size === 0) {
+    return mentions;
+  }
+
+  const myAcct = state.getIn(['accounts', me, 'acct']);
+
+  return mentions.filter(mention => mention.get('id') !== me && mention.get('acct') !== myAcct);
+};
+
 // The checked recipients, rendered back into the "@a @b " prefix the API expects.
 export const replyMentionsPrefix = state => {
-  const mentions = state.getIn(['compose', 'reply_mentions']);
+  const mentions = selectReplyMentions(state);
 
   if (!mentions || mentions.size === 0) {
     return '';

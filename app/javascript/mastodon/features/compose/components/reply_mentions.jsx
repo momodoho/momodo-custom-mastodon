@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { useDispatch, useSelector } from 'react-redux';
 
+import { selectReplyMentions } from 'mastodon/actions/compose';
 import { openModal } from 'mastodon/actions/modal';
 
 // momodo: Twitter-style "Replying to @a @b" line above the compose box.
@@ -13,7 +14,7 @@ import { openModal } from 'mastodon/actions/modal';
 // or remove a recipient is this line, which opens the recipient picker.
 export const ReplyMentions = () => {
   const dispatch = useDispatch();
-  const mentions = useSelector(state => state.getIn(['compose', 'reply_mentions']));
+  const mentions = useSelector(selectReplyMentions);
 
   const handleClick = useCallback(() => {
     dispatch(openModal({ modalType: 'REPLY_MENTIONS', modalProps: {} }));

@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
 import { fetchAccount } from 'mastodon/actions/accounts';
-import { toggleReplyMention, setAllReplyMentions } from 'mastodon/actions/compose';
+import { toggleReplyMention, setAllReplyMentions, selectReplyMentions } from 'mastodon/actions/compose';
 import { Avatar } from 'mastodon/components/avatar';
 import { Button } from 'mastodon/components/button';
 import { CheckBox } from 'mastodon/components/check_box';
@@ -77,7 +77,7 @@ MentionRow.propTypes = {
 export const ReplyMentionsModal = ({ onClose }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
-  const mentions = useSelector(state => state.getIn(['compose', 'reply_mentions']));
+  const mentions = useSelector(selectReplyMentions);
 
   const allChecked = !!mentions && mentions.size > 0 && mentions.every(mention => mention.get('checked'));
 
