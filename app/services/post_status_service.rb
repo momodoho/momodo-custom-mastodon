@@ -191,7 +191,7 @@ class PostStatusService < BaseService
   def room_postprocess_status!
     LinkCrawlWorker.perform_async(@status.id)
 
-    channel = "timeline:room:#{@room.id}"
+    channel = "timeline:room:#{@room.token}"
     PushUpdateWorker.perform_async(@status.account_id, @status.id, channel) if redis.exists?("subscribed:#{channel}")
   end
 

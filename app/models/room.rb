@@ -7,6 +7,7 @@
 #  id          :bigint(8)        not null, primary key
 #  join_policy :integer          default("invite"), not null
 #  title       :string           default(""), not null
+#  token       :string           not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
 #  account_id  :bigint(8)        not null
@@ -20,6 +21,11 @@ class Room < ApplicationRecord
 
   TITLE_LENGTH_LIMIT = 256
   PER_ACCOUNT_LIMIT = 50
+  # momodo: public identifier. Rooms are addressed by this random token
+  # everywhere outside the database (API paths, SPA URLs, streaming channel),
+  # so a sequential primary key can no longer be used to discover or probe
+  # other people's rooms. 16 alphanumerics ≈ 95 bits.
+  TOKEN_LENGTH = 16
 
   # momodo: rooms are always invite-only. `open` is kept here for reversibility
   # but is never set (no UI / forced to invite on create — see RoomsController).
@@ -36,8 +42,26 @@ class Room < ApplicationRecord
   has_many :statuses, inverse_of: :room, dependent: :destroy
 
   validates :title, presence: true, length: { maximum: TITLE_LENGTH_LIMIT }
+  validates :token, presence: true, uniqueness: true
+
+  before_validation :ensure_token, on: :create
 
   scope :with_member, ->(account) { joins(:memberships).where(room_memberships: { account_id: account }) }
+
+  class << self
+    def generate_unique_token
+      loop do
+        token = SecureRandom.alphanumeric(TOKEN_LENGTH)
+        break token unless exists?(token: token)
+      end
+    end
+
+    # Public lookup. Never falls back to the numeric id — that is exactly the
+    # enumeration this token exists to prevent.
+    def lookup_by_token!(token)
+      find_by!(token: token.to_s)
+    end
+  end
 
   # Membership is dynamic: leaving the room immediately revokes read access
   # (visibility is checked live, never frozen into the status at write time).
@@ -49,5 +73,11 @@ class Room < ApplicationRecord
 
   def owner?(account)
     account_id == account&.id
+  end
+
+  private
+
+  def ensure_token
+    self.token = self.class.generate_unique_token if token.blank?
   end
 end

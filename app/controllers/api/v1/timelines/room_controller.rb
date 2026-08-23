@@ -17,7 +17,7 @@ class Api::V1::Timelines::RoomController < Api::V1::Timelines::BaseController
   private
 
   def set_room
-    @room = Room.find(params[:id])
+    @room = Room.lookup_by_token!(params[:id])
     # Live membership check: only current members can read the room timeline.
     raise Mastodon::NotPermittedError unless @room.member?(current_account)
   end
@@ -27,7 +27,7 @@ class Api::V1::Timelines::RoomController < Api::V1::Timelines::BaseController
   end
 
   def room_statuses
-    @room.statuses.to_a_paginated_by_id(
+    @room.statuses.includes(:room).to_a_paginated_by_id(
       limit_param(DEFAULT_STATUSES_LIMIT),
       params_slice(:max_id, :since_id, :min_id)
     )

@@ -620,14 +620,18 @@ const startServer = async () => {
   /**
    * momodo: a room timeline may be streamed only by a current member of the room
    * (live membership check against room_memberships).
-   * @param {string} roomId
+   *
+   * Rooms are addressed by their random token, never by the numeric primary
+   * key, so the channel name carries the token too (Rails publishes to
+   * `timeline:room:<token>`).
+   * @param {string} roomToken
    * @param {Request} req
    * @returns {Promise.<void>}
    */
-  const authorizeRoomAccess = async (roomId, req) => {
+  const authorizeRoomAccess = async (roomToken, req) => {
     const { accountId } = req;
 
-    const result = await pgPool.query('SELECT id FROM room_memberships WHERE room_id = $1 AND account_id = $2 LIMIT 1', [roomId, accountId]);
+    const result = await pgPool.query('SELECT rm.id FROM room_memberships rm INNER JOIN rooms r ON r.id = rm.room_id WHERE r.token = $1 AND rm.account_id = $2 LIMIT 1', [roomToken, accountId]);
 
     if (result.rows.length === 0) {
       throw new AuthenticationError('Room not found');

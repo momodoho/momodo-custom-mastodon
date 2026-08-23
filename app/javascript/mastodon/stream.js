@@ -96,6 +96,13 @@ const sharedCallbacks = {
   received(data) {
     const { stream } = data;
 
+    // momodo: the server also sends frames without a `stream` (e.g. the
+    // `{ error: 'Not authorized to stream this room' }` rejection you get when
+    // opening a room you can't read) — those used to throw here.
+    if (!Array.isArray(stream) || stream.length === 0) {
+      return;
+    }
+
     subscriptions.filter(({ channelName, params }) => {
       const streamChannelName = stream[0];
 

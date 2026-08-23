@@ -29,6 +29,6 @@ class DestroyRoomService < BaseService
   # channel until the next navigation. Published after the memberships are
   # gone, so a client that reacts by reconnecting is already locked out.
   def kick_live_members!
-    redis.publish("timeline:room:#{@room.id}", { event: :'room.destroyed', payload: @room.id.to_s }.to_json)
+    redis.publish("timeline:room:#{@room.token}", { event: :'room.destroyed', payload: @room.token }.to_json)
   end
 end

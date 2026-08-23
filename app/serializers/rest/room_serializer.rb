@@ -11,8 +11,10 @@ class REST::RoomSerializer < ActiveModel::Serializer
   # paired markers only — a lone "~~~" or "**" stays as typed
   MARKDOWN_PAIRS = [/```(?:[a-zA-Z0-9+#-]{1,20}\n)?(.+?)```/m, /`([^`\n]+?)`/, /\*\*\*(.+?)\*\*\*/, /\*\*(.+?)\*\*/, /__(.+?)__/, /~~(.+?)~~/, /\|\|(.+?)\|\|/, /(?<![\w*])\*([^*\n]+?)\*(?![\w*])/, /(?<![\w_])_([^_\n]+?)_(?![\w_])/].freeze
 
+  # momodo: the public id IS the random token — the numeric primary key never
+  # leaves the server, so rooms can't be enumerated by URL.
   def id
-    object.id.to_s
+    object.token
   end
 
   def account_id

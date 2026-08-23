@@ -33,9 +33,16 @@
   background-size: 32px auto !important;
 }
 
-// Breathing room between the logo and the menu list (they sat flush together).
+// Breathing room around the logo. The panel itself only pads 10px, so the logo
+// sat almost flush against the top edge and the gap above/below was uneven
+// (10px above vs 28px below). Even it out: ~22px above, ~24px below.
+.navigation-panel .navigation-panel__logo {
+  margin-top: 12px !important;
+  margin-bottom: 16px !important;
+}
+
 .navigation-panel .navigation-panel__menu {
-  margin-top: 16px !important;
+  margin-top: 8px !important;
 }
 
 // Fixed navigation order for the Twitter-style theme (momodo fixed order):

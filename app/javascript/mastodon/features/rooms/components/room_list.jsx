@@ -132,7 +132,7 @@ export const RoomList = ({ activeId, creating, onCreatingChange }) => {
       const ta = lastActivity(a);
       const tb = lastActivity(b);
       if (ta === tb) {
-        return Number(b.get('id')) - Number(a.get('id'));
+        return 0; // keep the server's order (room ids are opaque tokens)
       }
       return ta < tb ? 1 : -1;
     });

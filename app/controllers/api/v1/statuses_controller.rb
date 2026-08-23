@@ -123,7 +123,7 @@ class Api::V1::StatusesController < Api::BaseController
   def set_room
     return if status_params[:room_id].blank?
 
-    @room = Room.find(status_params[:room_id])
+    @room = Room.lookup_by_token!(status_params[:room_id])
     raise Mastodon::NotPermittedError unless @room.member?(current_user.account)
   rescue ActiveRecord::RecordNotFound, Mastodon::NotPermittedError
     render json: { error: I18n.t('rooms.errors.not_a_member') }, status: 404

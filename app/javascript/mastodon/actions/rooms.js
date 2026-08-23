@@ -9,7 +9,9 @@ export const ROOM_DESTROYED      = 'ROOM_DESTROYED';
 
 const roomFetchSuccess = room => ({ type: ROOM_FETCH_SUCCESS, room });
 const roomsFetchSuccess = rooms => ({ type: ROOMS_FETCH_SUCCESS, rooms });
-const roomFetchFail = (id, error) => ({ type: ROOM_FETCH_FAIL, id, error });
+// skipNotFound: an unknown/inaccessible room token shows the in-column 404
+// page — no need to also throw an error toast at the user.
+const roomFetchFail = (id, error) => ({ type: ROOM_FETCH_FAIL, id, error, skipNotFound: true });
 
 export const fetchRooms = () => (dispatch) =>
   api().get('/api/v1/rooms').then(({ data }) => dispatch(roomsFetchSuccess(data)));

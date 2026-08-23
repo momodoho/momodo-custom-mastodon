@@ -58,7 +58,7 @@ class REST::StatusSerializer < ActiveModel::Serializer
   end
 
   def room_id
-    object.room_id.to_s
+    object.room&.token
   end
 
   def in_reply_to_account_id

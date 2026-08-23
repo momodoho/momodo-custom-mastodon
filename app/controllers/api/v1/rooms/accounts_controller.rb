@@ -35,7 +35,7 @@ class Api::V1::Rooms::AccountsController < Api::BaseController
   private
 
   def set_room
-    @room = Room.find(params[:room_id])
+    @room = Room.lookup_by_token!(params[:room_id])
   end
 
   def authorize_owner!
