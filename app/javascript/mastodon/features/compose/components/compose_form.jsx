@@ -30,6 +30,7 @@ import { LanguageDropdown } from './language_dropdown';
 import { NavigationBar } from './navigation_bar';
 import { PollForm } from "./poll_form";
 import { ReplyIndicator } from './reply_indicator';
+import { ReplyMentions } from './reply_mentions';
 import { UploadForm } from './upload_form';
 import { Warning } from './warning';
 import { ComposeQuotedStatus } from './quoted_post';
@@ -78,6 +79,7 @@ class ComposeForm extends ImmutablePureComponent {
     anyMedia: PropTypes.bool,
     missingAltText: PropTypes.bool,
     isInReply: PropTypes.bool,
+    mentionPrefix: PropTypes.string, // momodo: reply recipients rendered outside the textarea
     singleColumn: PropTypes.bool,
     lang: PropTypes.string,
     maxChars: PropTypes.number,
@@ -124,7 +126,9 @@ class ComposeForm extends ImmutablePureComponent {
   };
 
   getFulltextForCharacterCounting = () => {
-    return [this.props.spoiler? this.props.spoilerText: '', countableText(this.props.text)].join('');
+    // momodo: the reply recipients are prepended to the text on submit, so they
+    // have to be counted here too (upstream had them inside the textarea).
+    return [this.props.spoiler? this.props.spoilerText: '', countableText(`${this.props.mentionPrefix ?? ''}${this.props.text}`)].join('');
   };
 
   canSubmit = () => {
@@ -205,7 +209,7 @@ class ComposeForm extends ImmutablePureComponent {
     if (this.props.focusDate && this.props.focusDate !== prevProps.focusDate) {
       let selectionEnd, selectionStart;
 
-      if (this.props.preselectDate !== prevProps.preselectDate && this.props.isInReply) {
+      if (this.props.preselectDate !== prevProps.preselectDate && this.props.isInReply && this.props.text.startsWith('@')) {
         selectionEnd   = this.props.text.length;
         selectionStart = this.props.text.search(/\s/) + 1;
       } else if (typeof this.props.caretPosition === 'number') {
@@ -284,6 +288,8 @@ class ComposeForm extends ImmutablePureComponent {
             <VisibilityButton disabled={this.props.isEditing} />
             <LanguageDropdown />
           </div>
+
+          <ReplyMentions />
 
           {this.props.spoiler && (
             <div className='spoiler-input'>

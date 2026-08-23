@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 
 import {
   changeCompose,
+  replyMentionsPrefix,
   submitCompose,
   clearComposeSuggestions,
   fetchComposeSuggestions,
@@ -58,6 +59,7 @@ const mapStateToProps = state => ({
     && state.getIn(['statuses', state.getIn(['compose', 'quoted_status_id']), 'account']) !== me
     && !state.getIn(['settings', 'dismissed_banners', PRIVATE_QUOTE_MODAL_ID]),
   isInReply: state.getIn(['compose', 'in_reply_to']) !== null,
+  mentionPrefix: replyMentionsPrefix(state), // momodo: reply recipients (outside the textarea)
   lang: state.getIn(['compose', 'language']),
   maxChars: state.getIn(['server', 'server', 'item', 'configuration', 'statuses', 'max_characters'], 500),
 });

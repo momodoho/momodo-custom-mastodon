@@ -67,6 +67,25 @@ export const COMPOSE_EMOJI_INSERT = 'COMPOSE_EMOJI_INSERT';
 export const COMPOSE_SCHEDULED_AT_CHANGE = 'COMPOSE_SCHEDULED_AT_CHANGE';
 export const COMPOSE_SCHEDULED_LOAD = 'COMPOSE_SCHEDULED_LOAD';
 export const COMPOSE_MARKDOWN_INSERT = 'COMPOSE_MARKDOWN_INSERT'; // momodo: Discord-style text effects
+// momodo: Twitter-style reply recipients (checkable, kept out of the textarea)
+export const COMPOSE_REPLY_MENTION_TOGGLE = 'COMPOSE_REPLY_MENTION_TOGGLE';
+export const COMPOSE_REPLY_MENTIONS_SET_ALL = 'COMPOSE_REPLY_MENTIONS_SET_ALL';
+
+export const toggleReplyMention = acct => ({ type: COMPOSE_REPLY_MENTION_TOGGLE, acct });
+export const setAllReplyMentions = checked => ({ type: COMPOSE_REPLY_MENTIONS_SET_ALL, checked });
+
+// The checked recipients, rendered back into the "@a @b " prefix the API expects.
+export const replyMentionsPrefix = state => {
+  const mentions = state.getIn(['compose', 'reply_mentions']);
+
+  if (!mentions || mentions.size === 0) {
+    return '';
+  }
+
+  const checked = mentions.filter(mention => mention.get('checked'));
+
+  return checked.size === 0 ? '' : `${checked.map(mention => `@${mention.get('acct')}`).join(' ')} `;
+};
 
 export const COMPOSE_POLL_ADD             = 'COMPOSE_POLL_ADD';
 export const COMPOSE_POLL_REMOVE          = 'COMPOSE_POLL_REMOVE';
@@ -197,7 +216,9 @@ export function directCompose(account) {
 
 export function submitCompose(successCallback) {
   return function (dispatch, getState) {
-    const statusText   = getState().getIn(['compose', 'text'], '');
+    // momodo: the reply recipients live outside the textarea — put the checked
+    // ones back in front of the text, exactly where upstream would have had them.
+    const statusText   = `${replyMentionsPrefix(getState())}${getState().getIn(['compose', 'text'], '')}`;
     const media        = getState().getIn(['compose', 'media_attachments']);
     const statusId     = getState().getIn(['compose', 'id'], null);
     const hasQuote     = !!getState().getIn(['compose', 'quoted_status_id']);

@@ -94,6 +94,8 @@ export const MODAL_COMPONENTS = {
   'IGNORE_NOTIFICATIONS': IgnoreNotificationsModal,
   'ANNUAL_REPORT': AnnualReportModal,
   'COMPOSE_PRIVACY': () => Promise.resolve({ default: VisibilityModal }),
+  // momodo: Twitter-style reply recipient picker
+  'REPLY_MENTIONS': () => import('@/mastodon/features/ui/components/reply_mentions_modal').then(module => ({ default: module.ReplyMentionsModal })),
   'ACCOUNT_NOTE': () => import('@/mastodon/features/account_timeline/modals/note_modal').then(module => ({ default: module.AccountNoteModal })),
   'ACCOUNT_FIELD_OVERFLOW': () => import('@/mastodon/features/account_timeline/modals/field_modal').then(module => ({ default: module.AccountFieldModal })),
   'ACCOUNT_JOIN_DATE': () => import('@/mastodon/features/account_timeline/modals/join_modal').then(module => ({ default: module.AccountJoinModal })),

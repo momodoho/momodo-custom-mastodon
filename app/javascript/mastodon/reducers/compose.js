@@ -46,6 +46,8 @@ import {
   COMPOSE_COMPOSING_CHANGE,
   COMPOSE_EMOJI_INSERT,
   COMPOSE_MARKDOWN_INSERT,
+  COMPOSE_REPLY_MENTION_TOGGLE,
+  COMPOSE_REPLY_MENTIONS_SET_ALL,
   COMPOSE_SCHEDULED_AT_CHANGE,
   COMPOSE_SCHEDULED_LOAD,
   COMPOSE_RESET,
@@ -95,6 +97,7 @@ const initialState = ImmutableMap({
   resetFileKey: Math.floor((Math.random() * 0x10000)),
   idempotencyKey: null,
   scheduled_at: null, // momodo: scheduled statuses
+  reply_mentions: ImmutableList(), // momodo: Twitter-style reply recipients
   tagHistory: ImmutableList(),
 
   // Quotes
@@ -110,14 +113,73 @@ const initialPoll = ImmutableMap({
   multiple: false,
 });
 
-function statusToTextMentions(state, status) {
+// momodo: Twitter-style reply recipients.
+//
+// Upstream prefills the compose textarea with "@a @b " when you reply, which
+// means a stray backspace silently drops someone from the conversation. Here
+// the mentions live OUTSIDE the textarea, as a checkable list rendered above
+// it (see features/compose/components/reply_mentions.jsx); submitCompose
+// prepends the checked ones to the text again, so the server side is
+// unchanged.
+//
+// Entries: { id, acct, username, checked }.
+function statusToReplyMentions(status) {
   let set = ImmutableOrderedSet([]);
 
   if (status.getIn(['account', 'id']) !== me) {
-    set = set.add(`@${status.getIn(['account', 'acct'])} `);
+    set = set.add(ImmutableMap({
+      id: status.getIn(['account', 'id']),
+      acct: status.getIn(['account', 'acct']),
+      username: status.getIn(['account', 'username']),
+      checked: true,
+    }));
   }
 
-  return set.union(status.get('mentions').filterNot(mention => mention.get('id') === me).map(mention => `@${mention.get('acct')} `)).join('');
+  const others = status.get('mentions')
+    .filterNot(mention => mention.get('id') === me || mention.get('acct') === status.getIn(['account', 'acct']))
+    .map(mention => ImmutableMap({
+      id: mention.get('id'),
+      acct: mention.get('acct'),
+      username: mention.get('username'),
+      checked: true,
+    }));
+
+  return set.union(others).toList();
+}
+
+// Leading "@handle " tokens of an existing draft (edit / redraft / scheduled
+// reload) are pulled out of the text into the same checkable list, so those
+// flows behave exactly like a fresh reply.
+const LEADING_MENTION_RE = /^@([a-z0-9_]+(?:@[a-z0-9.-]+[a-z0-9]+)?)(\s+|$)/i;
+
+function splitLeadingMentions(text) {
+  const accts = [];
+  let rest = text ?? '';
+  let match = rest.match(LEADING_MENTION_RE);
+
+  while (match) {
+    accts.push(match[1]);
+    rest = rest.slice(match[0].length);
+    match = rest.match(LEADING_MENTION_RE);
+  }
+
+  return [accts, rest];
+}
+
+// `status` (when known) supplies the account ids behind those handles.
+function textToReplyMentions(accts, status) {
+  const mentions = status ? status.get('mentions', ImmutableList()) : ImmutableList();
+
+  return ImmutableList(accts.map(acct => {
+    const mention = mentions.find(m => m.get('acct') === acct);
+
+    return ImmutableMap({
+      id: mention ? mention.get('id') : null,
+      acct,
+      username: mention ? mention.get('username') : acct.split('@')[0],
+      checked: true,
+    });
+  }));
 }
 
 function clearAll(state) {
@@ -140,6 +202,7 @@ function clearAll(state) {
     map.set('quote_policy', state.get('default_quote_policy'));
     map.set('isDragDisabled', false);
     map.set('scheduled_at', null); // momodo: scheduled statuses
+    map.set('reply_mentions', ImmutableList()); // momodo
   });
 }
 
@@ -442,7 +505,9 @@ export const composeReducer = (state = initialState, action) => {
     return state.withMutations(map => {
       map.set('id', null);
       map.set('in_reply_to', action.status.get('id'));
-      map.set('text', statusToTextMentions(state, action.status));
+      // momodo: mentions go to the recipient list, not into the textarea
+      map.set('text', '');
+      map.set('reply_mentions', statusToReplyMentions(action.status));
       map.set('privacy', privacyPreference(action.status.get('visibility'), state.get('default_privacy')));
       map.set('focusDate', new Date());
       map.set('caretPosition', null);
@@ -550,13 +615,27 @@ export const composeReducer = (state = initialState, action) => {
     return insertEmoji(state, action.position, action.emoji, action.needsSpace);
   case COMPOSE_MARKDOWN_INSERT:
     return insertMarkdown(state, action.start, action.end, action.prefix, action.suffix);
+  case COMPOSE_REPLY_MENTION_TOGGLE: // momodo: Twitter-style reply recipients
+    return state
+      .update('reply_mentions', list => list.map(mention => (
+        mention.get('acct') === action.acct ? mention.set('checked', !mention.get('checked')) : mention
+      )))
+      .set('idempotencyKey', uuid());
+  case COMPOSE_REPLY_MENTIONS_SET_ALL: // momodo
+    return state
+      .update('reply_mentions', list => list.map(mention => mention.set('checked', action.checked)))
+      .set('idempotencyKey', uuid());
   case COMPOSE_SCHEDULED_AT_CHANGE: // momodo: scheduled statuses
     return state.set('scheduled_at', action.value).set('idempotencyKey', uuid());
   case COMPOSE_SCHEDULED_LOAD: // momodo: "edit" a scheduled status = load it back into compose
     return state.withMutations(map => {
+      const inReplyTo = action.params.in_reply_to_id ? String(action.params.in_reply_to_id) : null;
+      const [accts, body] = inReplyTo ? splitLeadingMentions(action.params.text || '') : [[], action.params.text || ''];
+
       map.set('id', null);
-      map.set('text', action.params.text || '');
-      map.set('in_reply_to', action.params.in_reply_to_id ? String(action.params.in_reply_to_id) : null);
+      map.set('text', body);
+      map.set('reply_mentions', textToReplyMentions(accts, null));
+      map.set('in_reply_to', inReplyTo);
       map.set('privacy', action.params.visibility || state.get('default_privacy'));
       map.set('spoiler', !!action.params.spoiler_text);
       map.set('spoiler_text', action.params.spoiler_text || '');
@@ -568,8 +647,12 @@ export const composeReducer = (state = initialState, action) => {
     });
   case REDRAFT:
     return state.withMutations(map => {
-      map.set('text', action.raw_text || unescapeHTML(expandMentions(action.status)));
-      map.set('in_reply_to', action.status.get('in_reply_to_id'));
+      const inReplyTo = action.status.get('in_reply_to_id');
+      const [accts, body] = splitLeadingMentions(action.raw_text || unescapeHTML(expandMentions(action.status)));
+
+      map.set('text', inReplyTo ? body : (action.raw_text || unescapeHTML(expandMentions(action.status))));
+      map.set('reply_mentions', inReplyTo ? textToReplyMentions(accts, action.status) : ImmutableList());
+      map.set('in_reply_to', inReplyTo);
       map.set('privacy', action.status.get('visibility'));
       map.set('media_attachments', action.status.get('media_attachments').map((media) => media.set('unattached', true)));
       map.set('focusDate', new Date());
@@ -605,9 +688,13 @@ export const composeReducer = (state = initialState, action) => {
     });
   case COMPOSE_SET_STATUS:
     return state.withMutations(map => {
+      const inReplyTo = action.status.get('in_reply_to_id');
+      const [accts, body] = splitLeadingMentions(action.text);
+
       map.set('id', action.status.get('id'));
-      map.set('text', action.text);
-      map.set('in_reply_to', action.status.get('in_reply_to_id'));
+      map.set('text', inReplyTo ? body : action.text);
+      map.set('reply_mentions', inReplyTo ? textToReplyMentions(accts, action.status) : ImmutableList());
+      map.set('in_reply_to', inReplyTo);
       map.set('privacy', action.status.get('visibility'));
       map.set('media_attachments', action.status.get('media_attachments'));
       map.set('focusDate', new Date());

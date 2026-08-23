@@ -11905,6 +11905,90 @@ noscript {
   }
 }
 
+// momodo: Twitter-style reply recipients — the "Replying to @a @b" line above
+// the compose box, and the picker it opens. The mentions deliberately live
+// outside the textarea so they can't be backspaced away.
+.reply-mentions {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-brand, #1d9bf0);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: start;
+  padding: 0 16px 6px;
+  cursor: pointer;
+
+  &:hover &__accounts,
+  &:focus-visible &__accounts {
+    text-decoration: underline;
+  }
+
+  &__accounts {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+}
+
+.reply-mentions-modal {
+  &__list {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+  }
+
+  &__account {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: 15px;
+    text-align: start;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--color-bg-highlight, rgba(128, 128, 128, 12%));
+    }
+
+    &__name {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+
+      .display-name {
+        overflow: hidden;
+      }
+
+      span {
+        color: var(--color-text-secondary);
+        font-size: 14px;
+      }
+    }
+
+    &__placeholder {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--color-bg-highlight, rgba(128, 128, 128, 20%));
+      flex: 0 0 auto;
+    }
+
+    .check-box {
+      flex: 0 0 auto;
+      pointer-events: none;
+    }
+  }
+}
+
 // momodo: custom uploaded logo (React app). Displays up to 350×170 keeping aspect
 // ratio (fills its slot's width, scales down in narrow places like the nav).
 .logo--custom {
