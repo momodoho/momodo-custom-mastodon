@@ -931,10 +931,23 @@ ko:
       appearance:
         app_bg_dark: 앱/타임라인 배경 (어둠)
         app_bg_light: 앱/타임라인 배경 (밝음)
+        brand_color_brand: 버튼 · 강조 색
+        brand_color_brand_hint: '게시 버튼 등 주요 버튼의 배경색입니다. 예) #6364ff'
+        brand_color_brand_text: 버튼 글자 색
+        brand_color_brand_text_hint: '버튼 위에 올라가는 글자 색입니다. 배경색과 대비되게 지정하세요. 예) #ffffff'
+        brand_color_clear: 기본값
+        brand_color_link: 멘션 · 링크 색
+        brand_color_link_hint: '@아이디, #해시태그, 본문 링크 등 특수 문구의 색입니다. 예) #1d9bf0'
+        brand_colors: 버튼 & 글자 색 (테마별)
+        brand_colors_hint: 버튼과 멘션·해시태그 같은 특수 문구의 색을 밝음/어둠별로 지정합니다. 비워두면 해당 테마의 기본 색이 그대로 쓰입니다.
+        brand_scheme_dark: 어둠 모드
+        brand_scheme_light: 밝음 모드
         brand_theme_birdui: 트위터 테마
         brand_theme_default: 마스토돈 테마
         branding_uploads: 로고 & 배경 (테마별)
-        branding_uploads_hint: 테마(마스토돈/트위터)와 밝음/어둠별로 로고·로그인 배경·앱 배경을 각각 따로 올립니다. 각 칸은 독립적이라, 비워두면 다른 스킴이나 테마가 아니라 기본 마스토돈 이미지가 표시됩니다. 맨 위 '테마'를 고르면 그 테마의 이미지 칸만 아래에 보입니다(테마 선택은 저장 시 서버 기본 테마도 바뀝니다).
+        branding_uploads_hint: 테마(마스토돈/트위터)와 밝음/어둠별로 로고·로그인 배경·앱 배경을 각각 따로 업로드하여 설정 가능합니다.
+        branding_uploads_hint_blank: 비워두면 다른 스킨이나 테마가 아닌, 기본 마스토돈 이미지가 표시됩니다.
+        branding_uploads_hint_theme: 맨 위 '테마' 선택을 통하여 바꾸고자 하는 테마의 라이트/다크 모드 업로드를 진행해주세요.
         login_bg_dark: 로그인 배경 (어둠)
         login_bg_light: 로그인 배경 (밝음)
         logo_dark: 로고 (어둠)

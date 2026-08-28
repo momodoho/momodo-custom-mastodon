@@ -11,6 +11,20 @@ class Form::AdminSettings
     :"#{asset}_#{theme}_#{scheme}"
   end.freeze
 
+  # momodo: admin-configurable brand colors, same axes as the uploads above.
+  # `brand` = primary button/accent background, `brand_text` = the text drawn on
+  # it, `link` = mentions / hashtags / links. Blank keeps the theme's own color.
+  BRAND_COLOR_SLOTS = %w(brand brand_text link).freeze
+  BRAND_COLOR_KEYS = BRAND_COLOR_SLOTS.product(%w(default birdui), %w(light dark)).map do |slot, theme, scheme|
+    :"color_#{slot}_#{theme}_#{scheme}"
+  end.freeze
+
+  # Only used to seed the color picker widget when a slot is blank.
+  BRAND_COLOR_DEFAULTS = {
+    'default' => { 'brand' => '#6364ff', 'brand_text' => '#ffffff', 'link' => '#6364ff' },
+    'birdui' => { 'brand' => '#1d9bf0', 'brand_text' => '#ffffff', 'link' => '#1d9bf0' },
+  }.freeze
+
   KEYS = (%i(
     site_contact_username
     site_contact_email
@@ -53,7 +67,7 @@ class Form::AdminSettings
     landing_page
     wrapstodon
     email_footer_text
-  ) + BRAND_UPLOAD_KEYS).freeze
+  ) + BRAND_UPLOAD_KEYS + BRAND_COLOR_KEYS).freeze
 
   INTEGER_KEYS = %i(
     media_cache_retention_period
@@ -119,6 +133,7 @@ class Form::AdminSettings
   validates :site_short_description, length: { maximum: DESCRIPTION_LIMIT }, if: -> { defined?(@site_short_description) }
   validates :thumbnail_description, length: { maximum: DESCRIPTION_LIMIT }, if: -> { defined?(@thumbnail_description) }
   validates :status_page_url, url: true, allow_blank: true
+  validates(*BRAND_COLOR_KEYS, format: { with: /\A#[0-9a-fA-F]{6}\z/ }, allow_blank: true)
   validate :validate_site_uploads
   validates :landing_page, inclusion: { in: LANDING_PAGE }, if: -> { defined?(@landing_page) }
 

@@ -40,6 +40,8 @@
 
   %h4= t('admin.settings.appearance.branding_uploads')
   %p.lead= t('admin.settings.appearance.branding_uploads_hint')
+  %p.lead= t('admin.settings.appearance.branding_uploads_hint_blank')
+  %p.lead= t('admin.settings.appearance.branding_uploads_hint_theme')
 
   -# Only the section for the currently-selected theme (above) is shown; the
   -# inline script below toggles them. Both stay in the DOM so every field still
@@ -66,10 +68,39 @@
                   = material_symbol 'delete'
                   = t('admin.site_uploads.delete')
 
+      -# momodo: brand colors for this theme — same light/dark split as the
+      -# uploads above. Blank keeps the theme's own color.
+      %h6.momodo-color-heading= t('admin.settings.appearance.brand_colors')
+      %p.lead= t('admin.settings.appearance.brand_colors_hint')
+      - %w(light dark).each do |scheme|
+        %p.momodo-color-scheme-label= t("admin.settings.appearance.brand_scheme_#{scheme}")
+        - Form::AdminSettings::BRAND_COLOR_SLOTS.each do |slot|
+          - key = "color_#{slot}_#{token}_#{scheme}"
+          - value = @admin_settings.public_send(key).presence
+          - fallback = Form::AdminSettings::BRAND_COLOR_DEFAULTS[token][slot]
+          .fields-row
+            .fields-row__column.fields-row__column-6.fields-group
+              = f.input key.to_sym,
+                        as: :string,
+                        label: t("admin.settings.appearance.brand_color_#{slot}"),
+                        hint: t("admin.settings.appearance.brand_color_#{slot}_hint"),
+                        wrapper: :with_block_label,
+                        input_html: { placeholder: fallback, maxlength: 7, class: 'momodo-color-text', data: { color_key: key } }
+            .fields-row__column.fields-row__column-6.fields-group
+              %label.momodo-color-swatch
+                %input{ type: 'color', value: (value || fallback), data: { color_swatch_for: key }, aria: { label: t("admin.settings.appearance.brand_color_#{slot}") } }
+                %span.momodo-color-swatch__clear{ data: { color_clear_for: key } }= t('admin.settings.appearance.brand_color_clear')
+
   -# Show only the selected theme's upload slots, and switch live when the theme
   -# dropdown changes. Nonce required or CSP blocks the inline script.
   - brand_switch_js = "(function(){var s=document.querySelector('select[name$=\"[theme]\"]');var b=document.querySelectorAll('.brand-theme-section');if(!s||!b.length){return;}function u(){for(var i=0;i<b.length;i++){b[i].style.display=(b[i].getAttribute('data-brand-theme')===s.value)?'':'none';}}s.addEventListener('change',u);u();})();"
   = content_tag :script, brand_switch_js.html_safe, nonce: request.content_security_policy_nonce
+
+  -# Keep the color picker and its hex field in sync, and let "기본값" clear the
+  -# slot (an <input type=color> can never be empty, so the text field is the
+  -# source of truth and blank = use the theme's own color).
+  - color_sync_js = "(function(){var t=document.querySelectorAll('.momodo-color-text');for(var i=0;i<t.length;i++){(function(f){var k=f.getAttribute('data-color-key');var sw=document.querySelector('[data-color-swatch-for=\"'+k+'\"]');var cl=document.querySelector('[data-color-clear-for=\"'+k+'\"]');if(!sw){return;}f.addEventListener('input',function(){if(/^#[0-9a-fA-F]{6}$/.test(f.value)){sw.value=f.value;}});sw.addEventListener('input',function(){f.value=sw.value;});if(cl){cl.addEventListener('click',function(e){e.preventDefault();f.value='';});}})(t[i]);}})();"
+  = content_tag :script, color_sync_js.html_safe, nonce: request.content_security_policy_nonce
 
   .actions
     = f.button :button, t('generic.save_changes'), type: :submit

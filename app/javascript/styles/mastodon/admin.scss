@@ -2520,3 +2520,41 @@ body.admin .md-spoiler {
   border-radius: 4px;
   padding: 0 2px;
 }
+
+
+// momodo: brand color pickers on the appearance settings page. The hex text
+// field is the source of truth (blank = keep the theme's own color); the swatch
+// beside it is just a convenience that syncs with it.
+.momodo-color-heading {
+  margin-top: 20px;
+}
+
+.momodo-color-scheme-label {
+  margin: 12px 0 4px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.momodo-color-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 52px; // line up with the text field, below its label + hint
+
+  input[type='color'] {
+    width: 56px;
+    height: 36px;
+    padding: 2px;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  &__clear {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}

@@ -40,6 +40,20 @@ defaults: &defaults
   allow_referrer_origin: false
   landing_page: 'about'
   wrapstodon: true
+  # momodo: admin-configurable brand colors, per theme (마스토돈 = default /
+  # 트위터 = birdui) × color scheme (light/dark). Blank = the theme's own color.
+  color_brand_default_light: ''
+  color_brand_default_dark: ''
+  color_brand_birdui_light: ''
+  color_brand_birdui_dark: ''
+  color_brand_text_default_light: ''
+  color_brand_text_default_dark: ''
+  color_brand_text_birdui_light: ''
+  color_brand_text_birdui_dark: ''
+  color_link_default_light: ''
+  color_link_default_dark: ''
+  color_link_birdui_light: ''
+  color_link_birdui_dark: ''
 
 development:
   <<: *defaults

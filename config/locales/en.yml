@@ -970,10 +970,23 @@ en:
       appearance:
         app_bg_dark: App/timeline background (dark)
         app_bg_light: App/timeline background (light)
+        brand_color_brand: Button / accent color
+        brand_color_brand_hint: 'Background of primary buttons such as Post. e.g. #6364ff'
+        brand_color_brand_text: Button text color
+        brand_color_brand_text_hint: 'Text drawn on those buttons — keep it readable against the button color. e.g. #ffffff'
+        brand_color_clear: Default
+        brand_color_link: Mention / link color
+        brand_color_link_hint: 'Color of @mentions, #hashtags and links in posts. e.g. #1d9bf0'
+        brand_colors: Button & text colors (per theme)
+        brand_colors_hint: Set the color of buttons and of special text such as mentions and hashtags, separately for light and dark. Leave a field empty to keep the theme's own color.
+        brand_scheme_dark: Dark mode
+        brand_scheme_light: Light mode
         brand_theme_birdui: Twitter theme
         brand_theme_default: Mastodon theme
         branding_uploads: Logo & backgrounds (per theme)
-        branding_uploads_hint: Upload a custom logo and login/app background separately for each theme and color scheme. Each slot is independent — a slot you leave empty falls back to the default Mastodon asset (not to the other scheme or theme). Picking a theme above shows only that theme's slots below (the choice also sets the server default theme on save).
+        branding_uploads_hint: Upload a logo, a login background and an app background separately for each theme (Mastodon / Twitter) and color scheme.
+        branding_uploads_hint_blank: A slot you leave empty shows the default Mastodon image — not the other scheme or theme.
+        branding_uploads_hint_theme: Pick the theme at the top first, then upload its light / dark images below.
         login_bg_dark: Login background (dark)
         login_bg_light: Login background (light)
         logo_dark: Logo (dark)

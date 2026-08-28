@@ -10,6 +10,7 @@
 module BrandingOverridesHelper
   def momodo_branding_styles
     css = +''
+    css << momodo_color_css
     css << momodo_logo_css
 
     if user_signed_in?
@@ -29,6 +30,99 @@ module BrandingOverridesHelper
   end
 
   private
+
+  # momodo: admin-set brand colors for the ACTIVE theme, one block per color
+  # scheme. Both the Mastodon design tokens and the Bird UI variables are
+  # written, because the two themes read different names for the same thing
+  # (Bird UI derives links from --color-accent, so the link slot has to
+  # overwrite the leaf variables too, or a custom button color would drag the
+  # mention color along with it).
+  #
+  # The theme stylesheets declare their variables on the <html> element
+  # (`:root, [data-color-scheme=...]`), so these rules must target the same
+  # element and win with !important — a lower-specificity rule elsewhere in the
+  # tree would simply be ignored for inheritance.
+  def momodo_color_css
+    %w(light dark).filter_map { |scheme| color_scheme_rules(scheme) }.join
+  end
+
+  def color_scheme_rules(scheme)
+    brand = brand_color(:brand, scheme)
+    brand_text = brand_color(:brand_text, scheme)
+    link = brand_color(:link, scheme)
+
+    return if brand.blank? && brand_text.blank? && link.blank?
+
+    declarations = +''
+
+    if brand.present?
+      declarations << <<~CSS
+        --color-bg-brand-base: #{brand} !important;
+        --color-bg-brand-base-hover: color-mix(in srgb, #{brand} 85%, #000) !important;
+        --color-border-brand: #{brand} !important;
+        --color-accent: #{brand} !important;
+        --color-accent-dark: #{brand} !important;
+      CSS
+    end
+
+    if brand_text.present?
+      declarations << <<~CSS
+        --color-text-on-brand-base: #{brand_text} !important;
+        --color-button-text: #{brand_text} !important;
+        --color-ghost-button-text: #{brand_text} !important;
+      CSS
+    end
+
+    if link.present?
+      declarations << <<~CSS
+        --color-text-brand: #{link} !important;
+        --color-text-status-links: #{link} !important;
+        --color-link: #{link} !important;
+        --color-mention: #{link} !important;
+        --color-hashtag: #{link} !important;
+      CSS
+    end
+
+    css = <<~CSS
+      [data-color-scheme='#{scheme}'] {
+        #{declarations}
+      }
+    CSS
+
+    css << link_color_rules(scheme, link) if link.present?
+    css
+  end
+
+  # Bird UI paints every link inside a post with --color-accent, i.e. the same
+  # variable as the buttons. Without this the mention/hashtag color would just
+  # follow the button color, so the two slots are pinned apart explicitly.
+  # (The muted-status gray is restored afterwards, since !important would
+  # otherwise brighten filtered posts too.)
+  def link_color_rules(scheme, link)
+    prefix = "[data-color-scheme='#{scheme}']"
+
+    <<~CSS
+      #{prefix} .status__content a:not(.button):not(.status__content__read-more-button):not(.status__content__translate-button),
+      #{prefix} .reply-indicator__content a,
+      #{prefix} .room-message__content a,
+      #{prefix} .status-link.mention,
+      #{prefix} .status-link.hashtag,
+      #{prefix} .mention {
+        color: #{link} !important;
+      }
+
+      #{prefix} .muted .status__content a {
+        color: var(--color-text-tertiary) !important;
+      }
+    CSS
+  end
+
+  # Reads e.g. Setting.color_brand_birdui_dark. Only #rrggbb values are accepted
+  # (the form validates the same shape) so nothing can be injected into the CSS.
+  def brand_color(slot, scheme)
+    value = Setting.public_send(:"color_#{slot}_#{brand_theme_token}_#{scheme}").to_s.strip
+    value.match?(/\A#[0-9a-fA-F]{6}\z/) ? value : nil
+  end
 
   # Map the active theme to its brand-key token. themes.yml only ships `default`
   # (마스토돈) and `bird-ui` (트위터); anything else falls back to default.
