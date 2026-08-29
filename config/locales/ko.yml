@@ -938,7 +938,7 @@ ko:
         brand_color_clear: 기본값
         brand_color_link: 멘션 · 링크 색
         brand_color_link_hint: '@아이디, #해시태그, 본문 링크 등 특수 문구의 색입니다. 예) #1d9bf0'
-        brand_colors: 버튼 & 글자 색 (테마별)
+        brand_colors: 버튼 & 글자 색
         brand_colors_hint: 버튼과 멘션·해시태그 같은 특수 문구의 색을 밝음/어둠별로 지정합니다. 비워두면 해당 테마의 기본 색이 그대로 쓰입니다.
         brand_scheme_dark: 어둠 모드
         brand_scheme_light: 밝음 모드

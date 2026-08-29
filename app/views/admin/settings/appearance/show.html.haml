@@ -39,9 +39,12 @@
   %hr.spacer/
 
   %h4= t('admin.settings.appearance.branding_uploads')
-  %p.lead= t('admin.settings.appearance.branding_uploads_hint')
-  %p.lead= t('admin.settings.appearance.branding_uploads_hint_blank')
-  %p.lead= t('admin.settings.appearance.branding_uploads_hint_theme')
+  -# `p.hint` is the form's own small/secondary description style — same as the
+  -# per-field hints on this page (`%p.lead` rendered these at 17px primary,
+  -# which shouted next to everything else).
+  %p.hint= t('admin.settings.appearance.branding_uploads_hint')
+  %p.hint= t('admin.settings.appearance.branding_uploads_hint_blank')
+  %p.hint= t('admin.settings.appearance.branding_uploads_hint_theme')
 
   -# Only the section for the currently-selected theme (above) is shown; the
   -# inline script below toggles them. Both stay in the DOM so every field still
@@ -71,7 +74,7 @@
       -# momodo: brand colors for this theme — same light/dark split as the
       -# uploads above. Blank keeps the theme's own color.
       %h6.momodo-color-heading= t('admin.settings.appearance.brand_colors')
-      %p.lead= t('admin.settings.appearance.brand_colors_hint')
+      %p.hint= t('admin.settings.appearance.brand_colors_hint')
       - %w(light dark).each do |scheme|
         %p.momodo-color-scheme-label= t("admin.settings.appearance.brand_scheme_#{scheme}")
         - Form::AdminSettings::BRAND_COLOR_SLOTS.each do |slot|

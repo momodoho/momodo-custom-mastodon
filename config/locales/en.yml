@@ -977,7 +977,7 @@ en:
         brand_color_clear: Default
         brand_color_link: Mention / link color
         brand_color_link_hint: 'Color of @mentions, #hashtags and links in posts. e.g. #1d9bf0'
-        brand_colors: Button & text colors (per theme)
+        brand_colors: Button & text colors
         brand_colors_hint: Set the color of buttons and of special text such as mentions and hashtags, separately for light and dark. Leave a field empty to keep the theme's own color.
         brand_scheme_dark: Dark mode
         brand_scheme_light: Light mode
