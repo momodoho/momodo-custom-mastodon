@@ -63,6 +63,12 @@ class Auth::SessionsController < Devise::SessionsController
   # so the incoming credentials authenticate as an additional account appended
   # to the browser's ring.
   def preserve_current_session_for_add!
+    # Only a fresh credential submission needs detaching. The 2FA second step
+    # posts just `otp_attempt`, and `on_authentication_success` has already
+    # called `sign_in` from the prepended before_action — detaching here would
+    # log that user straight back out and Devise would fail the request with
+    # "invalid e-mail address or password".
+    return if @on_authentication_success_called || user_params[:email].blank?
     return unless user_signed_in?
 
     request.env['mastodon.preserve_session'] = true
@@ -95,8 +101,14 @@ class Auth::SessionsController < Devise::SessionsController
   def find_user_from_params
     user   = User.authenticate_with_ldap(user_params) if Devise.ldap_authentication
     user ||= User.authenticate_with_pam(user_params) if Devise.pam_authentication
-    user ||= User.find_for_authentication(email: user_params[:email])
-    user
+
+    if user.present?
+      @password_verified_externally = true
+      return user
+    end
+
+    user = User.find_for_authentication(email: user_params[:email])
+    user if user&.encrypted_password.present?
   end
 
   def user_params
