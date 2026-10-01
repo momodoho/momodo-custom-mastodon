@@ -62,15 +62,19 @@ class Rack::Attack
     end
   end
 
+  # momodo: 타임라인 읽기(페이징)와 이미지 업로드·프록시 한도를 upstream 기본값의 3배로
+  # 올렸다. 소수 인원 폐쇄형 서버라 상한이 학대 방지용인데, 기본값(특히 토큰당 300회/5분,
+  # 이미지 30회/30분)이 활발히 쓰면 429 "너무 많은 요청"으로 먼저 걸렸다.
+  # 인증·가입·비밀번호 계열 throttle은 무차별 대입 방어라 **건드리지 않는다.**
   Rack::Attack.blocklist('deny from blocklist') do |req|
     IpBlock.blocked?(req.remote_ip)
   end
 
-  throttle('throttle_authenticated_api', limit: 1_500, period: 5.minutes) do |req|
+  throttle('throttle_authenticated_api', limit: 4_500, period: 5.minutes) do |req|
     req.authenticated_user_id if req.api_request?
   end
 
-  throttle('throttle_per_token_api', limit: 300, period: 5.minutes) do |req|
+  throttle('throttle_per_token_api', limit: 900, period: 5.minutes) do |req|
     req.authenticated_token_id if req.api_request?
   end
 
@@ -78,11 +82,11 @@ class Rack::Attack
     req.throttleable_remote_ip if req.api_request? && req.unauthenticated?
   end
 
-  throttle('throttle_api_media', limit: 30, period: 30.minutes) do |req|
+  throttle('throttle_api_media', limit: 90, period: 30.minutes) do |req|
     req.authenticated_user_id if req.post? && req.path.match?(%r{\A/api/v\d+/media\z}i)
   end
 
-  throttle('throttle_media_proxy', limit: 30, period: 10.minutes) do |req|
+  throttle('throttle_media_proxy', limit: 90, period: 10.minutes) do |req|
     req.throttleable_remote_ip if req.path.start_with?('/media_proxy')
   end
 
@@ -90,7 +94,7 @@ class Rack::Attack
     req.throttleable_remote_ip if req.post? && req.path == '/api/v1/accounts'
   end
 
-  throttle('throttle_authenticated_paging', limit: 300, period: 15.minutes) do |req|
+  throttle('throttle_authenticated_paging', limit: 900, period: 15.minutes) do |req|
     req.authenticated_user_id if req.paging_request?
   end
 
