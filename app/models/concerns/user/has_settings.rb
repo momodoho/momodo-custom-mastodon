@@ -120,8 +120,9 @@ module User::HasSettings
   end
 
   def setting_default_privacy
-    # momodo: closed community defaults to unlisted instead of public.
-    settings['default_privacy'] || (account.locked? ? 'private' : 'unlisted')
+    # momodo: always 전체 공개 (unlisted). A stored 'private' / 'public' from
+    # before followers-only was removed is ignored rather than migrated.
+    'unlisted'
   end
 
   def setting_default_quote_policy

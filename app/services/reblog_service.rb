@@ -25,6 +25,8 @@ class ReblogService < BaseService
                  else
                    options[:visibility] || account.user&.setting_default_privacy
                  end
+    # momodo: no followers-only / fediverse-public boosts — same rule as posts.
+    visibility = :unlisted if !reblogged_status.hidden? && %w(public private).include?(visibility.to_s)
 
     reblog = account.statuses.create!(reblog: reblogged_status, text: '', visibility: visibility, rate_limit: options[:with_rate_limit])
 

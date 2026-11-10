@@ -7,11 +7,11 @@ import classNames from 'classnames';
 import type { StatusVisibility } from '@/mastodon/api_types/statuses';
 import { Popover } from '@/mastodon/components/popover';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
-import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 // momodo: PublicIcon unused — the "공개(public)" option is hidden from the picker.
 // import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import QuietTimeIcon from '@/material-icons/400-24px/quiet_time.svg?react';
 import { DropdownSelector } from 'mastodon/components/dropdown_selector';
+import type { SelectItem } from 'mastodon/components/dropdown_selector';
 import { Icon } from 'mastodon/components/icon';
 
 export const messages = defineMessages({
@@ -102,7 +102,7 @@ const PrivacyDropdown: React.FC<PrivacyDropdownProps> = ({
     [registerPreviousFocusTarget],
   );
 
-  const options = [
+  const options: (SelectItem & Required<Pick<SelectItem, 'icon' | 'iconComponent'>>)[] = [
     // momodo: "공개(public)" — fully federated to the wider fediverse — is hidden
     // from the picker for this closed community. The `public` visibility value
     // still exists in the backend (Status enum); it's just not user-selectable.
@@ -123,13 +123,7 @@ const PrivacyDropdown: React.FC<PrivacyDropdownProps> = ({
       meta: intl.formatMessage(messages.unlisted_long),
       extra: intl.formatMessage(messages.unlisted_extra),
     },
-    {
-      icon: 'lock',
-      iconComponent: LockIcon,
-      value: 'private',
-      text: intl.formatMessage(messages.private_short),
-      meta: intl.formatMessage(messages.private_long),
-    },
+    // momodo: no followers-only ("팔로워") option — 전체 공개 or 개인 멘션 only.
   ];
 
   if (!noDirect) {

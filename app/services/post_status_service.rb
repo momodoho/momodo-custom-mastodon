@@ -80,6 +80,10 @@ class PostStatusService < BaseService
     @visibility   = @options[:visibility] || @account.user&.setting_default_privacy
     @visibility   = :unlisted if @visibility&.to_sym == :public && @account.silenced?
     @visibility   = :private if @quoted_status&.private_visibility? && %i(public unlisted).include?(@visibility&.to_sym)
+    # momodo: posts are 전체 공개 (unlisted) or 개인 멘션 (direct), nothing else.
+    # Followers-only and fediverse-public are folded into unlisted here, so API
+    # clients, old default settings and scheduled posts all land the same way.
+    @visibility   = :unlisted if %i(public private).include?(@visibility&.to_sym)
     @visibility   = :limited if @room # momodo: room posts are always limited (member-only)
     @scheduled_at = @options[:scheduled_at]&.to_datetime
     @scheduled_at = nil if scheduled_in_the_past?

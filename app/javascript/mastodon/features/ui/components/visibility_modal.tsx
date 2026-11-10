@@ -18,7 +18,6 @@ import { messages as privacyMessages } from '@/mastodon/features/compose/compone
 import { createAppSelector, useAppSelector } from '@/mastodon/store';
 import AlternateEmailIcon from '@/material-icons/400-24px/alternate_email.svg?react';
 import CloseIcon from '@/material-icons/400-24px/close.svg?react';
-import LockIcon from '@/material-icons/400-24px/lock.svg?react';
 // momodo: PublicIcon unused — the "공개(public)" option is hidden from the picker.
 // import PublicIcon from '@/material-icons/400-24px/public.svg?react';
 import QuietTimeIcon from '@/material-icons/400-24px/quiet_time.svg?react';
@@ -105,7 +104,10 @@ const selectDisablePublicVisibilities = createAppSelector(
       return false;
     }
 
-    return status.get('visibility') === 'private';
+    // momodo: followers-only is gone, so self-quoting an old followers-only post
+    // must still offer 전체 공개 — otherwise only 개인 멘션 would be left, and
+    // quotes can't go into private mentions. (Upstream: visibility === 'private'.)
+    return false;
   },
 );
 
@@ -138,14 +140,8 @@ export const VisibilityModal: FC<VisibilityModalProps> = forwardRef(
     );
 
     const visibilityItems = useMemo<SelectItem<StatusVisibility>[]>(() => {
+      // momodo: no followers-only ("팔로워") option — 전체 공개 or 개인 멘션 only.
       const items: SelectItem<StatusVisibility>[] = [
-        {
-          value: 'private',
-          text: intl.formatMessage(privacyMessages.private_short),
-          meta: intl.formatMessage(privacyMessages.private_long),
-          icon: 'lock',
-          iconComponent: LockIcon,
-        },
         {
           value: 'direct',
           text: intl.formatMessage(privacyMessages.direct_short),

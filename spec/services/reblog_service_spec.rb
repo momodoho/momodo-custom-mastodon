@@ -16,11 +16,12 @@ RSpec.describe ReblogService do
       subject.call(alice, status, visibility: reblog_visibility)
     end
 
+    # momodo: no followers-only boosts — they become unlisted like posts
     describe 'boosting privately' do
       let(:reblog_visibility) { :private }
 
-      it 'reblogs privately' do
-        expect(status.reblogs.first.visibility).to eq 'private'
+      it 'reblogs unlisted' do
+        expect(status.reblogs.first.visibility).to eq 'unlisted'
       end
     end
 

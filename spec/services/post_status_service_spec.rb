@@ -120,10 +120,16 @@ RSpec.describe PostStatusService do
   end
 
   it 'creates a status with the given visibility' do
-    status = create_status_with_options(visibility: :private)
+    status = create_status_with_options(visibility: :direct)
 
     expect(status).to be_persisted
-    expect(status.visibility).to eq 'private'
+    expect(status.visibility).to eq 'direct'
+  end
+
+  # momodo: only 전체 공개 (unlisted) and 개인 멘션 (direct) exist
+  it 'folds followers-only and public into unlisted' do
+    expect(create_status_with_options(visibility: :private).visibility).to eq 'unlisted'
+    expect(create_status_with_options(visibility: :public).visibility).to eq 'unlisted'
   end
 
   it 'raises on an invalid visibility' do
@@ -323,12 +329,14 @@ RSpec.describe PostStatusService do
       .to enqueue_sidekiq_job(ActivityPub::QuoteRequestWorker)
   end
 
-  it 'correctly downgrades visibility for private self-quotes' do
+  # momodo: followers-only no longer exists, so a self-quote of an old
+  # followers-only post is posted unlisted like everything else
+  it 'posts self-quotes of private posts as unlisted' do
     account = Fabricate(:account)
     quoted_status = Fabricate(:status, account: account, visibility: :private)
 
     status = subject.call(account, text: 'test', quoted_status: quoted_status)
-    expect(status).to be_private_visibility
+    expect(status).to be_unlisted_visibility
   end
 
   it 'correctly preserves visibility for private mentions self-quoting private posts' do

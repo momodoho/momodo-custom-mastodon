@@ -191,7 +191,7 @@ function clearAll(state) {
     map.set('is_submitting', false);
     map.set('is_changing_upload', false);
     map.set('in_reply_to', null);
-    map.set('privacy', state.get('default_privacy'));
+    map.set('privacy', allowedPrivacy(state.get('default_privacy')));
     map.set('sensitive', state.get('default_sensitive'));
     map.set('language', state.get('default_language'));
     map.update('media_attachments', list => list.clear());
@@ -314,9 +314,14 @@ const insertMarkdown = (state, start, end, prefix, suffix) => {
   });
 };
 
+// momodo: a new post is 전체 공개 (unlisted) or 개인 멘션 (direct) — nothing
+// else. Replying to / redrafting an old followers-only (or public) post must
+// not carry that visibility over. The server enforces the same rule.
+const allowedPrivacy = (visibility) => (visibility === 'direct' ? 'direct' : 'unlisted');
+
 const privacyPreference = (a, b) => {
   const order = ['public', 'unlisted', 'private', 'direct'];
-  return order[Math.max(order.indexOf(a), order.indexOf(b), 0)];
+  return allowedPrivacy(order[Math.max(order.indexOf(a), order.indexOf(b), 0)]);
 };
 
 const hydrate = (state, hydratedState) => {
@@ -431,13 +436,9 @@ export const composeReducer = (state = initialState, action) => {
     return state
       .set('quoted_status_id', isDirect ? null : status.get('id'))
       .update('spoiler', spoiler => (spoiler) || !!status.get('spoiler_text'))
-      .update('spoiler_text', (spoiler_text) => spoiler_text || status.get('spoiler_text'))
-      .update('privacy', (visibility) => {
-        if (['public', 'unlisted'].includes(visibility) && status.get('visibility') === 'private') {
-          return 'private';
-        }
-        return visibility;
-      });
+      // momodo: upstream also narrows the quote to followers-only when quoting a
+      // followers-only post; that visibility no longer exists here.
+      .update('spoiler_text', (spoiler_text) => spoiler_text || status.get('spoiler_text'));
   } else if (quoteComposeCancel.match(action)) {
     return state.set('quoted_status_id', null);
   } else if (setComposeQuotePolicy.match(action)) {
@@ -636,7 +637,7 @@ export const composeReducer = (state = initialState, action) => {
       map.set('text', body);
       map.set('reply_mentions', textToReplyMentions(accts, null));
       map.set('in_reply_to', inReplyTo);
-      map.set('privacy', action.params.visibility || state.get('default_privacy'));
+      map.set('privacy', allowedPrivacy(action.params.visibility || state.get('default_privacy')));
       map.set('spoiler', !!action.params.spoiler_text);
       map.set('spoiler_text', action.params.spoiler_text || '');
       map.set('sensitive', !!action.params.sensitive);
@@ -653,7 +654,7 @@ export const composeReducer = (state = initialState, action) => {
       map.set('text', inReplyTo ? body : (action.raw_text || unescapeHTML(expandMentions(action.status))));
       map.set('reply_mentions', inReplyTo ? textToReplyMentions(accts, action.status) : ImmutableList());
       map.set('in_reply_to', inReplyTo);
-      map.set('privacy', action.status.get('visibility'));
+      map.set('privacy', allowedPrivacy(action.status.get('visibility')));
       map.set('media_attachments', action.status.get('media_attachments').map((media) => media.set('unattached', true)));
       map.set('focusDate', new Date());
       map.set('caretPosition', null);

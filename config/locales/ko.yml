@@ -2126,8 +2126,8 @@ ko:
       private: 팔로워만
       public: 공개
       public_long: 마스토돈 내외 모두
-      unlisted: 조용한 공개
-      unlisted_long: 마스토돈 검색결과, 유행, 공개 타임라인에서 숨기기
+      unlisted: 전체 공개
+      unlisted_long: 이 커뮤니티 모두에게 공개 (바깥 마스토돈엔 비공개)
   statuses_cleanup:
     enabled: 오래된 게시물 자동 삭제
     enabled_hint: 아래의 예외 목록에 해당하지 않는다면, 명시된 기한 이후 당신의 게시물을 자동으로 삭제합니다

@@ -298,14 +298,21 @@ RSpec.describe User do
       expect(user.setting_default_privacy).to eq 'unlisted'
     end
 
-    it "returns 'private' if user has not configured default privacy setting and account is locked" do
+    # momodo: the default is always 전체 공개 (unlisted) — locked accounts too.
+    it "returns 'unlisted' if user has not configured default privacy setting and account is locked" do
       user = Fabricate(:account, locked: true).user
-      expect(user.setting_default_privacy).to eq 'private'
+      expect(user.setting_default_privacy).to eq 'unlisted'
     end
 
-    it "returns 'public' if user has not configured default privacy setting and account is not locked" do
+    it "returns 'unlisted' if user has not configured default privacy setting and account is not locked" do
       user = Fabricate(:account, locked: false).user
-      expect(user.setting_default_privacy).to eq 'public'
+      expect(user.setting_default_privacy).to eq 'unlisted'
+    end
+
+    it "ignores a stored 'private' default (followers-only was removed)" do
+      user = Fabricate(:user)
+      user.settings[:default_privacy] = 'private'
+      expect(user.setting_default_privacy).to eq 'unlisted'
     end
   end
 

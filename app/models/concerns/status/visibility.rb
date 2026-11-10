@@ -19,9 +19,11 @@ module Status::Visibility
   end
 
   class_methods do
-    # momodo: closed community — public posting is disabled (local/unlisted only).
+    # momodo: closed community — the only default you can pick is 전체 공개
+    # (unlisted). Fediverse-public and followers-only are gone; 개인 멘션 (direct)
+    # is chosen per post, never as a default.
     def selectable_visibilities
-      visibilities.keys - %w(direct limited public)
+      visibilities.keys - %w(direct limited public private)
     end
   end
 
@@ -43,7 +45,7 @@ module Status::Visibility
   end
 
   def visibility_from_account
-    # momodo: default to unlisted (never public) so nothing leaks externally.
-    account.locked? ? :private : :unlisted
+    # momodo: always unlisted — locked accounts too (no followers-only posts).
+    :unlisted
   end
 end
