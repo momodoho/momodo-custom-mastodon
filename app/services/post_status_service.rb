@@ -20,6 +20,15 @@ class PostStatusService < BaseService
     end
   end
 
+  class IdempotencyError < StandardError
+    attr_reader :status
+
+    def initialize(status)
+      super()
+      @status = status
+    end
+  end
+
   # Post a text status update, fetch and notify remote users mentioned
   # @param [Account] account Account from which to post
   # @param [Hash] options
@@ -47,9 +56,10 @@ class PostStatusService < BaseService
     @quoted_status = @options[:quoted_status]
     @room          = @options[:room] # momodo: member-only room channel
 
+    preprocess_attributes!
+
     with_idempotency do
       validate_media!
-      preprocess_attributes!
 
       # momodo: room posts cannot be scheduled — the room object wouldn't survive
       # the params round-trip, and rooms are live-only by design
@@ -68,7 +78,7 @@ class PostStatusService < BaseService
     end
 
     @status
-  rescue Antispam::SilentlyDrop => e
+  rescue Antispam::SilentlyDrop, IdempotencyError => e
     e.status
   end
 
@@ -266,7 +276,7 @@ class PostStatusService < BaseService
     return yield unless idempotency_given?
 
     with_redis_lock("idempotency:lock:status:#{@account.id}:#{@options[:idempotency]}") do
-      return idempotency_duplicate if idempotency_duplicate?
+      raise IdempotencyError, idempotency_duplicate if idempotency_duplicate?
 
       yield
 
