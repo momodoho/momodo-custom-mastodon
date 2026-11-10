@@ -18,6 +18,7 @@ class Auth::SessionsController < Devise::SessionsController
   before_action :require_no_authentication_unless_adding, only: [:new]
 
   include Auth::TwoFactorAuthenticationConcern
+  include Auth::SignInTokenAuthenticationConcern
 
   content_security_policy only: :new do |p|
     p.form_action(false)
@@ -112,7 +113,7 @@ class Auth::SessionsController < Devise::SessionsController
   end
 
   def user_params
-    params.expect(user: [:email, :password, :otp_attempt, credential: {}])
+    params.expect(user: [:email, :password, :otp_attempt, :sign_in_token_attempt, credential: {}])
   end
 
   def after_sign_in_path_for(resource)
@@ -218,6 +219,10 @@ class Auth::SessionsController < Devise::SessionsController
         success: false
       )
     )
+
+    # No need to send a mail for failure to log in with a sign-in token, as that goes throug a mail
+    # as well
+    return if security_measure == :sign_in_token
 
     # Only send a notification email every hour at most
     return if redis.set("2fa_failure_notification:#{user.id}", '1', ex: 1.hour, get: true).present?

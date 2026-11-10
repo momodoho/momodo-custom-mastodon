@@ -63,6 +63,7 @@ ko:
       demote: 강등
       destroyed_msg: "%{username}의 데이터는 곧 삭제되도록 대기열에 들어갔습니다"
       disable: 동결
+      disable_sign_in_token: 보안 코드 확인 일시 해제
       disable_sign_in_token_auth: 이메일 토큰 인증 비활성화
       disable_two_factor_authentication: 2단계 인증을 비활성화
       disabled: 동결됨
@@ -72,6 +73,7 @@ ko:
       email: 이메일
       email_status: 이메일 상태
       enable: 동결 해제
+      enable_sign_in_token: 보안 코드 확인 다시 켜기
       enable_sign_in_token_auth: 이메일 토큰 인증 활성화
       enabled: 활성
       enabled_msg: "%{username}의 동결을 성공적으로 해제 했습니다."
@@ -2252,6 +2254,14 @@ ko:
       further_actions_html: 만약 당신이 한 게 아니었다면 유출의 가능성이 있으니 가능한 빨리 %{action} 하시기 바랍니다.
       subject: 2차 인증 실패
       title: 2차 인증에 실패했습니다
+    sign_in_token:
+      change_password: 암호 변경
+      details: '로그인 시도에 대한 상세 정보입니다:'
+      explanation: '오랫동안 접속하지 않은 계정에 로그인 시도가 있었습니다. 본인이 맞다면 로그인 확인 화면에 아래 보안 코드를 입력해 주세요:'
+      further_actions: '본인이 아니라면 암호를 바꾸고 2단계 인증을 켜 주세요. 여기서 할 수 있습니다:'
+      further_actions_html: 직접 시도한 것이 아니라면, 지금 바로 %{action}과 2단계 인증 활성화로 계정을 보호하시길 권해드립니다.
+      subject: 로그인 시도를 확인해 주세요
+      title: 로그인 시도
     suspicious_sign_in:
       change_password: 암호 변경
       details: '로그인에 대한 상세 정보입니다:'
@@ -2340,8 +2350,12 @@ ko:
       title: 환영합니다 %{name} 님!
   users:
     follow_limit_reached: 당신은 %{limit}명의 사람을 넘어서 팔로우 할 수 없습니다
+    generic_access_help_html: 계정에 접근하는 데 문제가 있다면 %{email}로 문의해 주세요
     go_to_sso_account_settings: ID 공급자의 계정 설정으로 이동
+    inactive_sign_in_confirmation: 오랜만에 로그인하셔서, 본인 확인을 위해 이메일로 보안 코드를 보냈습니다.
+    inactive_sign_in_title: 보안 코드를 확인해 주세요
     invalid_otp_token: 2단계 인증 코드가 올바르지 않습니다
+    invalid_sign_in_token: 보안 코드가 올바르지 않습니다
     otp_lost_help_html: 만약 양쪽 모두를 잃어버렸다면 %{email}을 통해 복구할 수 있습니다
     rate_limited: 너무 많은 인증 시도가 있었습니다, 잠시 후에 시도하세요.
     seamless_external_login: 외부 서비스를 이용해 로그인했으므로 이메일과 암호는 설정할 수 없습니다.
