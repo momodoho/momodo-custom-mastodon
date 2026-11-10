@@ -4,7 +4,6 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useIntl, defineMessages, FormattedMessage } from 'react-intl';
 
 import { Helmet } from '@unhead/react/helmet';
-import { NavLink } from 'react-router-dom';
 
 import { useIdentity } from '@/mastodon/identity_context';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
@@ -169,15 +168,9 @@ const Firehose = ({ feedType, multiColumn }) => {
     />
   );
 
-  let title;
-
-  if (canViewFeed(signedIn, permissions, localLiveFeedAccess) && canViewFeed(signedIn, permissions, remoteLiveFeedAccess)) {
-    title = messages.title;
-  } else if (canViewFeed(signedIn, permissions, localLiveFeedAccess)) {
-    title = messages.title_local;
-  } else {
-    title = messages.title_singular;
-  }
+  // momodo: one feed only — this server. No "this server / other servers / all"
+  // tabs; /public and /public/remote redirect here (features/ui/index.jsx).
+  const title = messages.title_singular;
 
   return (
     <Column bindToDocument={!multiColumn} ref={columnRef} label={intl.formatMessage(messages.title)}>
@@ -192,22 +185,6 @@ const Firehose = ({ feedType, multiColumn }) => {
       >
         <ColumnSettings />
       </ColumnHeader>
-
-      {(canViewFeed(signedIn, permissions, localLiveFeedAccess) && canViewFeed(signedIn, permissions, remoteLiveFeedAccess)) && (
-        <div className='account__section-headline'>
-          <NavLink exact to='/public/local'>
-            <FormattedMessage tagName='div' id='firehose.local' defaultMessage='This server' />
-          </NavLink>
-
-          <NavLink exact to='/public/remote'>
-            <FormattedMessage tagName='div' id='firehose.remote' defaultMessage='Other servers' />
-          </NavLink>
-
-          <NavLink exact to='/public'>
-            <FormattedMessage tagName='div' id='firehose.all' defaultMessage='All' />
-          </NavLink>
-        </div>
-      )}
 
       <StatusListContainer
         prepend={prependBanner}

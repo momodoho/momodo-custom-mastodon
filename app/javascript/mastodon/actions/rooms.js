@@ -1,5 +1,6 @@
 import api from '../api';
 
+import { importFetchedStatus } from './importer';
 import { updateTimeline, clearTimeline } from './timelines';
 
 export const ROOMS_FETCH_SUCCESS = 'ROOMS_FETCH_SUCCESS';
@@ -58,3 +59,19 @@ export const removeRoomMember = (id, accountId) => () =>
 export const submitRoomStatus = (roomId, text, mediaIds = []) => (dispatch) =>
   api().post('/api/v1/statuses', { status: text, room_id: roomId, media_ids: mediaIds })
     .then(({ data }) => { dispatch(updateTimeline(`room:${roomId}`, data)); return data; });
+
+// momodo: the raw text of one of my room messages, for the inline editor
+// (the store only has the rendered HTML).
+export const fetchRoomStatusSource = id =>
+  api().get(`/api/v1/statuses/${id}/source`).then(({ data }) => data);
+
+// momodo: edit one of my room messages — text only. Everything else is sent back
+// unchanged: a PUT without media_ids would drop the attached images.
+export const editRoomStatus = (status, text, spoilerText) => (dispatch) =>
+  api().put(`/api/v1/statuses/${status.get('id')}`, {
+    status: text,
+    spoiler_text: spoilerText,
+    sensitive: status.get('sensitive'),
+    language: status.get('language'),
+    media_ids: status.get('media_attachments').map((m) => m.get('id')).toArray(),
+  }).then(({ data }) => { dispatch(importFetchedStatus(data)); return data; });

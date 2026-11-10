@@ -11817,6 +11817,93 @@ noscript {
     color: var(--room-muted);
     margin: 2px 4px 0;
   }
+
+  // momodo: ⋯ (edit / delete) on my own messages — shows on hover/focus, always
+  // visible (faint) on touch screens where there is no hover.
+  &__menu {
+    align-self: center;
+    flex: 0 0 auto;
+    opacity: 0;
+    transition: opacity 0.15s;
+
+    .icon-button { color: var(--room-muted); }
+
+    // While open, Dropdown renames the icon to `close`. Bird UI paints an X
+    // background on `.icon-close`, which landed on top of our ⋯ svg. Keep just ⋯.
+    .icon-close { background-image: none !important; }
+  }
+
+  &:hover &__menu,
+  &__menu:focus-within,
+  &__menu:has(.active) { opacity: 1; }
+
+  @media (hover: none) {
+    &__menu { opacity: 0.6; }
+  }
+
+  &--editing {
+    max-width: 90%;
+    width: 90%;
+  }
+  &--editing &__body { width: 100%; }
+
+  &__editor {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &__textarea {
+      width: 100%;
+      box-sizing: border-box;
+      resize: none;
+      font: inherit;
+      font-size: 15px;
+      line-height: 1.4;
+      padding: 10px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--room-bubble-mine);
+      background: var(--room-input-bg);
+      color: inherit;
+      outline: 0;
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    &__hint {
+      flex: 1 1 auto;
+      font-size: 12px;
+      color: var(--room-muted);
+      padding-inline-start: 6px;
+    }
+
+    &__button {
+      border: 1px solid var(--room-border);
+      background: transparent;
+      color: inherit;
+      border-radius: 16px;
+      padding: 4px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &--primary {
+        border-color: var(--room-bubble-mine);
+        background: var(--room-bubble-mine);
+        color: var(--room-bubble-mine-text);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+    }
+  }
 }
 
 // ---- composer -------------------------------------------------------------

@@ -208,11 +208,12 @@ class SwitchingColumnsArea extends PureComponent {
             <WrappedRoute path='/terms-of-service/:date?' component={TermsOfService} content={children} />
 
             <WrappedRoute path={['/home', '/timelines/home']} component={HomeTimeline} content={children} />
-            <Redirect from='/timelines/public' to='/public' exact />
+            {/* momodo: the live feed is this server only — "all" and "other servers" fold into it */}
+            <Redirect from='/timelines/public' to='/public/local' exact />
             <Redirect from='/timelines/public/local' to='/public/local' exact />
-            <WrappedRoute path='/public' exact component={Firehose} componentParams={{ feedType: 'public' }} content={children} />
+            <Redirect from='/public' to='/public/local' exact />
+            <Redirect from='/public/remote' to='/public/local' exact />
             <WrappedRoute path='/public/local' exact component={Firehose} componentParams={{ feedType: 'community' }} content={children} />
-            <WrappedRoute path='/public/remote' exact component={Firehose} componentParams={{ feedType: 'public:remote' }} content={children} />
             <WrappedRoute path={['/conversations', '/timelines/direct']} component={DirectTimeline} content={children} />
             <WrappedRoute path='/tags/:id' component={HashtagTimeline} content={children} />
             <WrappedRoute path='/links/:url' component={LinkTimeline} content={children} />
@@ -569,7 +570,7 @@ class UI extends PureComponent {
   };
 
   handleHotkeyGoToFederated = () => {
-    this.props.history.push('/public');
+    this.props.history.push('/public/local'); // momodo: no federated feed
   };
 
   handleHotkeyGoToDirect = () => {

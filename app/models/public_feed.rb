@@ -86,9 +86,11 @@ class PublicFeed
   end
 
   def public_scope
-    # momodo: closed community has no public posts, so local/public timelines
-    # surface unlisted statuses instead.
-    Status.unlisted_visibility.joins(:account).merge(Account.without_suspended.without_silenced)
+    # momodo: closed community — the composer only offers unlisted, so the live
+    # feed is built from unlisted posts. But public ones (old posts, API clients)
+    # must show too: unlisted-only silently dropped them. Locked accounts are not
+    # excluded; their followers-only posts stay out because they are `private`.
+    Status.where(visibility: %i(public unlisted)).joins(:account).merge(Account.without_suspended.without_silenced)
   end
 
   def local_only_scope

@@ -312,12 +312,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
               icon='globe'
               iconComponent={PublicIcon}
               isActive={isFirehoseActive}
-              text={intl.formatMessage(
-                canViewFeed(signedIn, permissions, localLiveFeedAccess) &&
-                  canViewFeed(signedIn, permissions, remoteLiveFeedAccess)
-                  ? messages.firehose
-                  : messages.firehose_singular,
-              )}
+              text={intl.formatMessage(messages.firehose_singular)}
             />
           </li>
         )}

@@ -77,6 +77,8 @@ class UpdateStatusService < BaseService
     raise Mastodon::ValidationError, I18n.t('media_attachments.validations.not_found', ids: not_found_ids.join(', ')) if not_found_ids.any?
 
     raise Mastodon::ValidationError, I18n.t('media_attachments.validations.images_and_video') if media_attachments.size > 1 && media_attachments.find(&:audio_or_video?)
+    # momodo: rooms take images only (PostStatusService enforces this on create)
+    raise Mastodon::ValidationError, I18n.t('rooms.errors.images_only') if @status.room_id? && media_attachments.any?(&:audio_or_video?)
     raise Mastodon::ValidationError, I18n.t('media_attachments.validations.not_ready') if media_attachments.any?(&:not_processed?)
 
     media_attachments
@@ -135,14 +137,31 @@ class UpdateStatusService < BaseService
   end
 
   def update_metadata!
-    ProcessHashtagsService.new.call(@status)
-    ProcessMentionsService.new.call(@status)
+    # momodo: room posts carry no hashtags or mentions (same as PostStatusService),
+    # so an edit must not grow them — that would notify people outside the room.
+    unless @status.room_id?
+      ProcessHashtagsService.new.call(@status)
+      ProcessMentionsService.new.call(@status)
+    end
     ProcessLinksService.new.call(@status)
   end
 
   def broadcast_updates!
+    return broadcast_room_update! if @status.room_id?
+
     DistributionWorker.perform_async(@status.id, { 'update' => true })
     ActivityPub::StatusUpdateDistributionWorker.perform_async(@status.id)
+  end
+
+  # momodo: a room post lives only in its room. The regular fan-out would push the
+  # edit into the author's home feed (and federate it), so send it to the room's
+  # real-time stream instead — the same channel the post was created on.
+  def broadcast_room_update!
+    room = @status.room
+    return if room.nil?
+
+    channel = "timeline:room:#{room.token}"
+    PushUpdateWorker.perform_async(@status.account_id, @status.id, channel, { 'update' => true }) if redis.exists?("subscribed:#{channel}")
   end
 
   def queue_poll_notifications!

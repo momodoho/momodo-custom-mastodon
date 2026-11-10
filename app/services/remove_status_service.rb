@@ -27,13 +27,15 @@ class RemoveStatusService < BaseService
       remove_from_self if @account.local?
       remove_from_followers
       remove_from_lists
+      remove_from_room if @status.room_id?
 
       # There is no reason to send out Undo activities when the
       # cause is that the original object has been removed, since
       # original object being removed implicitly removes reblogs
       # of it. The Delete activity of the original is forwarded
       # separately.
-      remove_from_remote_reach if @account.local? && !@options[:original_removed]
+      # momodo: room posts never federate, so there is nothing to retract.
+      remove_from_remote_reach if @account.local? && !@options[:original_removed] && !@status.room_id?
 
       # Since reblogs don't mention anyone, don't get reblogged,
       # favourited and don't contain their own media attachments
@@ -73,6 +75,17 @@ class RemoveStatusService < BaseService
     @account.lists_for_local_distribution.select(:id, :account_id).includes(account: :user).reorder(nil).find_each do |list|
       FeedManager.instance.unpush_from_list(list, @status)
     end
+  end
+
+  # momodo: room members watch the room's own stream, not their home feed, so the
+  # delete has to be published there or the message stays on their screens.
+  def remove_from_room
+    return if skip_streaming?
+
+    room = @status.room
+    return if room.nil?
+
+    redis.publish("timeline:room:#{room.token}", @payload)
   end
 
   def remove_from_mentions
