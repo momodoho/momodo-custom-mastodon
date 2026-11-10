@@ -33,6 +33,19 @@
   background-size: 32px auto !important;
 }
 
+// No hover pill on the logo. Bird UI paints a rounded grey background on
+// `.column-link:hover > span::before` for nav items, and our custom logo is a
+// <span> inside the logo link, so hovering it laid a grey "shadow" over the
+// logo. It's a home link, not a menu item — keep it flat on hover. Only hover:
+// Bird UI draws the keyboard focus ring on the same ::before, so
+// :focus-visible must keep it.
+.layout-single-column,
+.layout-multiple-columns {
+  .column-link.column-link--logo:hover:not(:focus-visible) > span::before {
+    opacity: 0 !important;
+  }
+}
+
 // Breathing room around the logo. The panel itself only pads 10px, so the logo
 // sat almost flush against the top edge and the gap above/below was uneven
 // (10px above vs 28px below). Even it out: ~22px above, ~24px below.
