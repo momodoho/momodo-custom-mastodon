@@ -162,6 +162,9 @@ export const NavigationBar: React.FC = () => {
   const { signedIn } = useIdentity();
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.navigation.open);
+  const hasUnreadRooms = useAppSelector(
+    (state) => state.room_unread.size > 0,
+  );
   const intl = useIntl();
 
   const handleClick = useCallback(() => {
@@ -205,7 +208,15 @@ export const NavigationBar: React.FC = () => {
           aria-label={intl.formatMessage(messages.menu)}
           type='button'
         >
-          <Icon id='' icon={MenuIcon} />
+          {/* momodo: on phones "그룹 메시지" lives inside this menu, so a dot here
+              says some room has new messages */}
+          <IconWithBadge
+            id=''
+            icon={MenuIcon}
+            count={0}
+            issueBadge={hasUnreadRooms}
+            className=''
+          />
         </button>
       </div>
     </div>

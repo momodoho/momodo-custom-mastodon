@@ -13,7 +13,7 @@ module Mastodon
     end
 
     def patch
-      1
+      5 # momodo: v4.7.2~4.7.5 security fixes are backported (UPGRADING §1-d)
     end
 
     def default_prerelease

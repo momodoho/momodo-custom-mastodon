@@ -15,7 +15,7 @@ import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
 import { openModal } from 'mastodon/actions/modal';
-import { fetchRoom, fetchRooms, leaveRoom, destroyRoom } from 'mastodon/actions/rooms';
+import { fetchRoom, fetchRooms, leaveRoom, destroyRoom, markRoomRead } from 'mastodon/actions/rooms';
 import { Icon } from 'mastodon/components/icon';
 import { connectRoomStream } from 'mastodon/actions/streaming';
 import { expandRoomTimeline } from 'mastodon/actions/timelines';
@@ -45,7 +45,13 @@ const messages = defineMessages({
 
 const mapStateToProps = (state, props) => ({
   room: state.getIn(['rooms', props.params.id]),
+  // momodo: unread badge — newest message id in this room + whether the
+  // poller still thinks it is unread; either changing means "mark read again".
+  topId: state.getIn(['timelines', `room:${props.params.id}`, 'items', 0]),
+  isUnread: state.get('room_unread').has(props.params.id),
 });
+
+const MARK_READ_DELAY = 2000;
 
 class RoomTimeline extends PureComponent {
 
@@ -54,6 +60,8 @@ class RoomTimeline extends PureComponent {
     dispatch: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
     room: PropTypes.oneOfType([ImmutablePropTypes.map, PropTypes.bool]),
+    topId: PropTypes.string,
+    isUnread: PropTypes.bool,
     ...WithRouterPropTypes,
   };
 
@@ -99,7 +107,39 @@ class RoomTimeline extends PureComponent {
     dispatch(expandRoomTimeline(id));
 
     this.disconnect = dispatch(connectRoomStream(id));
+
+    this.markRead();
+    document.addEventListener('visibilitychange', this.handleVisibility);
   }
+
+  // momodo: unread badge. Opening a room reads it. While it stays open, new
+  // messages arriving over the stream are read too — batched (one request per
+  // burst) and only while the tab is actually visible; a hidden tab reads
+  // them when it comes back.
+  markRead = () => {
+    clearTimeout(this.markReadTimer);
+    this.markReadTimer = null;
+
+    if (document.visibilityState !== 'visible') {
+      this.pendingRead = true;
+      return;
+    }
+
+    this.pendingRead = false;
+    this.props.dispatch(markRoomRead(this.props.params.id));
+  };
+
+  scheduleMarkRead = () => {
+    if (!this.markReadTimer) {
+      this.markReadTimer = setTimeout(this.markRead, MARK_READ_DELAY);
+    }
+  };
+
+  handleVisibility = () => {
+    if (document.visibilityState === 'visible' && this.pendingRead) {
+      this.markRead();
+    }
+  };
 
   componentDidUpdate (prevProps) {
     const { dispatch, params: { id } } = this.props;
@@ -114,10 +154,17 @@ class RoomTimeline extends PureComponent {
       dispatch(expandRoomTimeline(id));
 
       this.disconnect = dispatch(connectRoomStream(id));
+
+      this.markRead();
+    } else if (this.props.topId !== prevProps.topId || (this.props.isUnread && !prevProps.isUnread)) {
+      this.scheduleMarkRead();
     }
   }
 
   componentWillUnmount () {
+    clearTimeout(this.markReadTimer);
+    document.removeEventListener('visibilitychange', this.handleVisibility);
+
     if (this.disconnect) {
       this.disconnect();
       this.disconnect = null;

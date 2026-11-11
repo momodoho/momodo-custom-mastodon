@@ -20,6 +20,7 @@ import { injectIntl } from '@/mastodon/components/intl';
 import { Hotkeys } from 'mastodon/components/hotkeys';
 import { HoverCardController } from 'mastodon/components/hover_card_controller';
 import { PictureInPicture } from 'mastodon/features/picture_in_picture';
+import { RoomUnreadPoller } from 'mastodon/features/rooms/components/unread_poller';
 import { identityContextPropShape, withIdentity } from 'mastodon/identity_context';
 import { layoutFromWindow, transientSingleColumn } from 'mastodon/is_mobile';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
@@ -671,6 +672,7 @@ class UI extends PureComponent {
           {!minimalShell && <NavigationBar />}
           {layout !== 'mobile' && <PictureInPicture />}
           <AlertsController />
+          {this.props.identity.signedIn && <RoomUnreadPoller />}
           {!disableHoverCards && <HoverCardController />}
           <HashtagMenuController />
           <LoadingBarContainer className='loading-bar' />

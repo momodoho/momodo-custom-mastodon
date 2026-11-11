@@ -148,6 +148,36 @@ const NotificationsLink = () => {
   );
 };
 
+// momodo: "그룹 메시지" with a badge = number of my rooms that have messages I
+// haven't seen (kept fresh by RoomUnreadPoller, cleared by opening the room).
+const RoomsLink: React.FC<{ text: string }> = ({ text }) => {
+  const count = useAppSelector((state) => state.room_unread.size);
+
+  return (
+    <ColumnLink
+      transparent
+      to='/rooms'
+      icon={
+        <IconWithBadge
+          id='users'
+          icon={GroupsIcon}
+          count={count}
+          className='column-link__icon'
+        />
+      }
+      activeIcon={
+        <IconWithBadge
+          id='users'
+          icon={GroupsActiveIcon}
+          count={count}
+          className='column-link__icon'
+        />
+      }
+      text={text}
+    />
+  );
+};
+
 const FollowRequestsLink: React.FC = () => {
   const intl = useIntl();
   const count = useAppSelector(
@@ -384,14 +414,7 @@ export const NavigationPanel: React.FC<{ multiColumn?: boolean }> = ({
               />
             </li>
             <li>
-              <ColumnLink
-                transparent
-                to='/rooms'
-                icon='users'
-                iconComponent={GroupsIcon}
-                activeIconComponent={GroupsActiveIcon}
-                text={intl.formatMessage(messages.rooms)}
-              />
+              <RoomsLink text={intl.formatMessage(messages.rooms)} />
             </li>
 
             <li role='separator' />

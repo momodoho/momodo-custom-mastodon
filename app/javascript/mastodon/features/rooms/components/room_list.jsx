@@ -26,6 +26,7 @@ const messages = defineMessages({
   cancel: { id: 'rooms.create_cancel', defaultMessage: 'Cancel' },
   you: { id: 'rooms.you', defaultMessage: 'You' },
   image: { id: 'rooms.snippet.image', defaultMessage: 'Sent an image' },
+  unread: { id: 'rooms.unread', defaultMessage: 'New messages' },
 });
 
 // momodo: strip HTML for a one-line preview of a status from the store.
@@ -42,7 +43,7 @@ const snippetFromStatus = (status, intl) => {
   return '';
 };
 
-const RoomListItem = ({ room, active, intl }) => {
+const RoomListItem = ({ room, active, unread, intl }) => {
   const id = room.get('id');
 
   // Prefer the live timeline (updated in real time over the stream) and fall
@@ -68,12 +69,13 @@ const RoomListItem = ({ room, active, intl }) => {
   }
 
   return (
-    <Link to={`/rooms/${id}`} className={classNames('room-list__item', { 'room-list__item--active': active })}>
+    <Link to={`/rooms/${id}`} className={classNames('room-list__item', { 'room-list__item--active': active, 'room-list__item--unread': unread })}>
       <RoomAvatar room={room} size={48} />
       <span className='room-list__item__body'>
         <span className='room-list__item__top'>
           <span className='room-list__item__title'>{room.get('title')}</span>
           {when && <span className='room-list__item__time'><RelativeTimestamp timestamp={when} /></span>}
+          {unread && <span className='room-list__item__unread' aria-label={intl.formatMessage(messages.unread)} />}
         </span>
         <span className='room-list__item__snippet'>
           {text ? (
@@ -97,6 +99,7 @@ const RoomListItem = ({ room, active, intl }) => {
 RoomListItem.propTypes = {
   room: PropTypes.object.isRequired,
   active: PropTypes.bool,
+  unread: PropTypes.bool,
   intl: PropTypes.object.isRequired,
 };
 
@@ -107,6 +110,7 @@ export const RoomList = ({ activeId, creating, onCreatingChange }) => {
   const rooms = useSelector((state) => state.get('rooms'));
   const timelines = useSelector((state) => state.get('timelines'));
   const statuses = useSelector((state) => state.get('statuses'));
+  const unreadIds = useSelector((state) => state.get('room_unread'));
 
   const [query, setQuery] = useState('');
   const [title, setTitle] = useState('');
@@ -213,7 +217,7 @@ export const RoomList = ({ activeId, creating, onCreatingChange }) => {
           </div>
         ) : (
           items.map((room) => (
-            <RoomListItem key={room.get('id')} room={room} active={room.get('id') === activeId} intl={intl} />
+            <RoomListItem key={room.get('id')} room={room} active={room.get('id') === activeId} unread={room.get('id') !== activeId && unreadIds.has(room.get('id'))} intl={intl} />
           ))
         )}
       </div>

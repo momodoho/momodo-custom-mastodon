@@ -11501,6 +11501,21 @@ noscript {
     &__time { flex: 0 0 auto; font-size: 13px; color: var(--room-muted); }
     &__snippet { font-size: 14px; color: var(--room-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     &__you { color: var(--room-muted); }
+
+    // momodo: unread badge — a dot after the time and a darker preview line
+    &__unread {
+      flex: 0 0 auto;
+      align-self: center;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--room-bubble-mine);
+    }
+
+    &--unread &__snippet {
+      color: inherit;
+      font-weight: 600;
+    }
   }
 }
 

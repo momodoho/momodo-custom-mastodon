@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Api::V1::RoomsController < Api::BaseController
-  before_action -> { doorkeeper_authorize! :read }, only: [:index, :show]
-  before_action -> { doorkeeper_authorize! :write }, except: [:index, :show]
+  before_action -> { doorkeeper_authorize! :read }, only: [:index, :show, :unread]
+  before_action -> { doorkeeper_authorize! :write }, except: [:index, :show, :unread]
 
   before_action :require_user!
-  before_action :set_room, except: [:index, :create]
+  before_action :set_room, except: [:index, :create, :unread]
 
   def index
     # momodo: newest activity first (DM-style list)
@@ -51,6 +51,21 @@ class Api::V1::RoomsController < Api::BaseController
 
     @room.memberships.find_by(account: current_account)&.destroy
     render json: @room, serializer: REST::RoomSerializer
+  end
+
+  # momodo: which of my rooms have messages I haven't seen (by token). Polled by
+  # the web client (on load + every 5 minutes) to badge the "그룹 메시지" nav.
+  def unread
+    render json: { room_ids: RoomMembership.unread_room_tokens_for(current_account) }
+  end
+
+  # momodo: I've seen everything in this room up to now.
+  def read
+    membership = @room.memberships.find_by(account: current_account)
+    raise Mastodon::NotPermittedError if membership.nil?
+
+    membership.mark_read!
+    render_empty
   end
 
   # Explicit "blow up the room" for clients that want to say so out loud.

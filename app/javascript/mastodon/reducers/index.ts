@@ -21,6 +21,7 @@ import media_attachments from './media_attachments';
 import meta from './meta';
 import { modalReducer } from './modal';
 import { navigationReducer } from './navigation';
+import roomUnread from './room_unread';
 import rooms from './rooms';
 import { notificationGroupsReducer } from './notification_groups';
 import { notificationPolicyReducer } from './notification_policy';
@@ -69,6 +70,7 @@ const reducers = {
   height_cache,
   lists: listsReducer,
   rooms,
+  room_unread: roomUnread, // momodo: group-message unread badge
   followedTags: followedTagsReducer,
   filters,
   conversations,

@@ -264,9 +264,14 @@ namespace :api, format: false do
     end
 
     resources :rooms, only: [:index, :create, :show, :update, :destroy] do
+      collection do
+        get :unread # momodo: unread badge
+      end
+
       member do
         post :join
         post :leave
+        post :read # momodo: mark room read
       end
       resource :accounts, only: [:show, :create, :destroy], module: :rooms
     end

@@ -7,6 +7,8 @@ export const ROOMS_FETCH_SUCCESS = 'ROOMS_FETCH_SUCCESS';
 export const ROOM_FETCH_SUCCESS  = 'ROOM_FETCH_SUCCESS';
 export const ROOM_FETCH_FAIL     = 'ROOM_FETCH_FAIL';
 export const ROOM_DESTROYED      = 'ROOM_DESTROYED';
+export const ROOMS_UNREAD_SET    = 'ROOMS_UNREAD_SET';
+export const ROOM_MARK_READ      = 'ROOM_MARK_READ';
 
 const roomFetchSuccess = room => ({ type: ROOM_FETCH_SUCCESS, room });
 const roomsFetchSuccess = rooms => ({ type: ROOMS_FETCH_SUCCESS, rooms });
@@ -75,3 +77,18 @@ export const editRoomStatus = (status, text, spoilerText) => (dispatch) =>
     language: status.get('language'),
     media_ids: status.get('media_attachments').map((m) => m.get('id')).toArray(),
   }).then(({ data }) => { dispatch(importFetchedStatus(data)); return data; });
+
+// momodo: unread badge for group messages. The server answers with the tokens
+// of my rooms that got a message from someone else since I last read them —
+// one cheap query, polled on load and then every few minutes (see
+// features/rooms/components/unread_poller.jsx).
+export const fetchRoomsUnread = () => (dispatch) =>
+  api().get('/api/v1/rooms/unread')
+    .then(({ data }) => dispatch({ type: ROOMS_UNREAD_SET, ids: data.room_ids || [] }));
+
+// momodo: I've looked at this room. Clear its badge right away (optimistic) and
+// move the server-side read marker up to the newest message.
+export const markRoomRead = id => (dispatch) => {
+  dispatch({ type: ROOM_MARK_READ, id: String(id) });
+  return api().post(`/api/v1/rooms/${id}/read`).catch(() => undefined);
+};
