@@ -1,8 +1,4 @@
-import {
-  apiRequestPost,
-  apiRequestGet,
-  apiRequestDelete,
-} from 'mastodon/api';
+import { apiRequestPost, apiRequestGet, apiRequestDelete } from 'mastodon/api';
 import type { ApiAccountJSON } from 'mastodon/api_types/accounts';
 
 export const apiGetRoomAccounts = (roomId: string) =>

@@ -931,15 +931,11 @@ en:
       empty: No rooms have been created yet.
       export_csv: Export CSV
       hint: All group-message rooms on this server. Click a room to view and manage its members.
-      join_policy: Join policy
       member: Member
       member_removed: "%{acct} was removed from the room."
       members: Members
       name: Name
       owner: Owner
-      policy:
-        invite: Invite only
-        open: Open
       remove_member: Remove
       remove_member_confirm: Remove %{acct} from this room? Their existing posts will remain.
       role: Role

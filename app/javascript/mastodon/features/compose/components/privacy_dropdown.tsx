@@ -102,7 +102,8 @@ const PrivacyDropdown: React.FC<PrivacyDropdownProps> = ({
     [registerPreviousFocusTarget],
   );
 
-  const options: (SelectItem & Required<Pick<SelectItem, 'icon' | 'iconComponent'>>)[] = [
+  const options: (SelectItem &
+    Required<Pick<SelectItem, 'icon' | 'iconComponent'>>)[] = [
     // momodo: "공개(public)" — fully federated to the wider fediverse — is hidden
     // from the picker for this closed community. The `public` visibility value
     // still exists in the backend (Status enum); it's just not user-selectable.

@@ -1061,7 +1061,7 @@ body > [data-popover-placement] {
   code {
     font-family: var(--font-monospace);
     font-size: 0.85em;
-    background: rgba(128, 128, 128, 0.18);
+    background: rgba(128, 128, 128, 18%);
     border-radius: 4px;
     padding: 1px 4px;
   }
@@ -1071,7 +1071,7 @@ body > [data-popover-placement] {
     white-space: pre-wrap;
     padding: 8px 10px;
     margin: 4px 0;
-    border: 1px solid rgba(128, 128, 128, 0.25);
+    border: 1px solid rgba(128, 128, 128, 25%);
   }
 
   .md-spoiler {
@@ -1083,7 +1083,7 @@ body > [data-popover-placement] {
     body:not(.admin) &:not(.md-spoiler--revealed) {
       cursor: pointer;
       user-select: none;
-      background: rgba(128, 128, 128, 0.85);
+      background: rgba(128, 128, 128, 85%);
       color: transparent;
 
       a,
@@ -1102,7 +1102,7 @@ body > [data-popover-placement] {
     }
 
     &.md-spoiler--revealed {
-      background: rgba(128, 128, 128, 0.25);
+      background: rgba(128, 128, 128, 25%);
     }
   }
 }
@@ -11319,6 +11319,7 @@ noscript {
 
   display: flex;
   flex-direction: row;
+
   // `.columns-area--mobile .column { height: 100% }` would let us grow with
   // content; a chat pane must be viewport-sized so only the messages scroll.
   height: calc(100dvh - var(--rooms-chrome)) !important;
@@ -11353,7 +11354,9 @@ noscript {
     max-width: 1000px !important;
   }
 
-  .layout-single-column .columns-area__panels:has(.rooms-shell) .columns-area__panels__pane--compositional {
+  .layout-single-column
+    .columns-area__panels:has(.rooms-shell)
+    .columns-area__panels__pane--compositional {
     display: none;
   }
 }
@@ -11361,14 +11364,26 @@ noscript {
 // Narrow: one pane at a time.
 @media (width < 1175px) {
   .rooms-shell {
-    &__list { flex: 1 1 auto; max-width: none; border-inline-end: 0; }
-    &--chat &__list { display: none; }
-    &--list &__main { display: none; }
+    &__list {
+      flex: 1 1 auto;
+      max-width: none;
+      border-inline-end: 0;
+    }
+
+    &--chat &__list {
+      display: none;
+    }
+
+    &--list &__main {
+      display: none;
+    }
   }
 }
 
 @media (width <= 889px) {
-  .rooms-shell { --rooms-chrome: 55px; }
+  .rooms-shell {
+    --rooms-chrome: 55px;
+  }
 }
 
 // ---- left pane: chat list -------------------------------------------------
@@ -11403,8 +11418,15 @@ noscript {
     justify-content: center;
     cursor: pointer;
 
-    .icon { width: 20px; height: 20px; }
-    &:hover, &.active { background: var(--room-hover); }
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover,
+    &.active {
+      background: var(--room-hover);
+    }
   }
 
   &__search {
@@ -11434,8 +11456,14 @@ noscript {
       font-family: inherit;
       outline: none;
 
-      &:focus { border-color: var(--room-bubble-mine); background: transparent; }
-      &::placeholder { opacity: 0.6; }
+      &:focus {
+        border-color: var(--room-bubble-mine);
+        background: transparent;
+      }
+
+      &::placeholder {
+        opacity: 0.6;
+      }
     }
   }
 
@@ -11457,7 +11485,10 @@ noscript {
       font-size: 15px;
       font-family: inherit;
 
-      &:focus { outline: none; border-color: var(--room-bubble-mine); }
+      &:focus {
+        outline: none;
+        border-color: var(--room-bubble-mine);
+      }
     }
 
     &__actions {
@@ -11465,7 +11496,10 @@ noscript {
       justify-content: flex-end;
       gap: 8px;
 
-      .button { border-radius: 999px; padding: 6px 16px; }
+      .button {
+        border-radius: 999px;
+        padding: 6px 16px;
+      }
     }
   }
 
@@ -11492,15 +11526,56 @@ noscript {
     border-inline-end: 2px solid transparent;
     transition: background 0.12s;
 
-    &:hover { background: var(--room-hover); }
-    &--active { background: var(--room-active); border-inline-end-color: var(--room-bubble-mine); }
+    &:hover {
+      background: var(--room-hover);
+    }
 
-    &__body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-    &__top { display: flex; align-items: baseline; gap: 8px; }
-    &__title { flex: 1 1 auto; min-width: 0; font-weight: 700; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    &__time { flex: 0 0 auto; font-size: 13px; color: var(--room-muted); }
-    &__snippet { font-size: 14px; color: var(--room-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    &__you { color: var(--room-muted); }
+    &--active {
+      background: var(--room-active);
+      border-inline-end-color: var(--room-bubble-mine);
+    }
+
+    &__body {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    &__top {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    &__title {
+      flex: 1 1 auto;
+      min-width: 0;
+      font-weight: 700;
+      font-size: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__time {
+      flex: 0 0 auto;
+      font-size: 13px;
+      color: var(--room-muted);
+    }
+
+    &__snippet {
+      font-size: 14px;
+      color: var(--room-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__you {
+      color: var(--room-muted);
+    }
 
     // momodo: unread badge — a dot after the time and a darker preview line
     &__unread {
@@ -11531,9 +11606,17 @@ noscript {
   background: var(--room-bubble-theirs);
   font-weight: 700;
 
-  img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+  }
 
-  &--empty { color: var(--room-muted); }
+  &--empty {
+    color: var(--room-muted);
+  }
 
   &--stack {
     overflow: visible;
@@ -11546,8 +11629,16 @@ noscript {
       border-radius: 50%;
     }
 
-    .room-avatar__back { top: 0; inset-inline-end: 0; }
-    .room-avatar__front { bottom: 0; inset-inline-start: 0; box-shadow: 0 0 0 2px var(--background-color); }
+    .room-avatar__back {
+      top: 0;
+      inset-inline-end: 0;
+    }
+
+    .room-avatar__front {
+      bottom: 0;
+      inset-inline-start: 0;
+      box-shadow: 0 0 0 2px var(--background-color);
+    }
   }
 }
 
@@ -11572,13 +11663,30 @@ noscript {
     justify-content: center;
     margin-bottom: 12px;
 
-    .icon { width: 48px; height: 48px; }
+    .icon {
+      width: 48px;
+      height: 48px;
+    }
   }
 
-  h2 { font-size: 26px; font-weight: 800; margin: 0; }
-  p { color: var(--room-muted); font-size: 15px; margin: 0 0 10px; }
+  h2 {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 0;
+  }
 
-  &__button { border-radius: 999px; padding: 10px 22px; font-size: 15px; font-weight: 700; }
+  p {
+    color: var(--room-muted);
+    font-size: 15px;
+    margin: 0 0 10px;
+  }
+
+  &__button {
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: 700;
+  }
 
   &__create {
     display: flex;
@@ -11596,10 +11704,15 @@ noscript {
       font-size: 15px;
       font-family: inherit;
 
-      &:focus { outline: none; border-color: var(--room-bubble-mine); }
+      &:focus {
+        outline: none;
+        border-color: var(--room-bubble-mine);
+      }
     }
 
-    .button { border-radius: 999px; }
+    .button {
+      border-radius: 999px;
+    }
   }
 }
 
@@ -11629,8 +11742,14 @@ noscript {
     color: inherit;
     margin-inline-start: -8px;
 
-    .icon { width: 20px; height: 20px; }
-    &:hover { background: var(--room-hover); }
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: var(--room-hover);
+    }
   }
 
   &__title {
@@ -11639,7 +11758,14 @@ noscript {
     display: flex;
     flex-direction: column;
 
-    h2 { font-size: 17px; font-weight: 800; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    h2 {
+      font-size: 17px;
+      font-weight: 800;
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   &__subtitle {
@@ -11664,7 +11790,11 @@ noscript {
     }
   }
 
-  &__actions { display: flex; gap: 4px; flex: 0 0 auto; }
+  &__actions {
+    display: flex;
+    gap: 4px;
+    flex: 0 0 auto;
+  }
 
   &__action {
     width: 36px;
@@ -11678,31 +11808,61 @@ noscript {
     justify-content: center;
     cursor: pointer;
 
-    .icon { width: 20px; height: 20px; }
-    &:hover { background: var(--room-hover); }
-    &--danger:hover { color: #f4212e; background: rgba(244, 33, 46, 12%); }
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: var(--room-hover);
+    }
+
+    &--danger:hover {
+      color: #f4212e;
+      background: rgba(244, 33, 46, 12%);
+    }
   }
 }
 
 @media (width < 1175px) {
-  .room-pane__back { display: inline-flex; }
+  .room-pane__back {
+    display: inline-flex;
+  }
 }
 
-.room-pane__back--always { display: inline-flex; }
+.room-pane__back--always {
+  display: inline-flex;
+}
 
 // members page inside the shell
 .room-members {
-  .column-search-header, .column-header__collapsible-inner { background: transparent; }
+  .column-search-header,
+  .column-header__collapsible-inner {
+    background: transparent;
+  }
 
   &__list {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
 
-    .scrollable { overflow: visible; }
-    .account { padding: 10px 16px; border-bottom: 0; }
-    .account .button { border-radius: 999px; }
-    .empty-column-indicator { padding: 32px 20px; color: var(--room-muted); }
+    .scrollable {
+      overflow: visible;
+    }
+
+    .account {
+      padding: 10px 16px;
+      border-bottom: 0;
+    }
+
+    .account .button {
+      border-radius: 999px;
+    }
+
+    .empty-column-indicator {
+      padding: 32px 20px;
+      color: var(--room-muted);
+    }
   }
 
   &__footer {
@@ -11710,7 +11870,9 @@ noscript {
     padding: 12px 16px;
     border-top: 1px solid var(--room-border);
 
-    .button { border-radius: 999px; }
+    .button {
+      border-radius: 999px;
+    }
   }
 }
 
@@ -11724,8 +11886,18 @@ noscript {
   gap: 2px;
   overscroll-behavior: contain;
 
-  &__loading, &__loading-more { display: flex; justify-content: center; padding: 16px; flex: 0 0 auto; }
-  &__loading { flex: 1 1 auto; align-items: center; }
+  &__loading,
+  &__loading-more {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    flex: 0 0 auto;
+  }
+
+  &__loading {
+    flex: 1 1 auto;
+    align-items: center;
+  }
 
   &__empty {
     flex: 1 1 auto;
@@ -11752,16 +11924,31 @@ noscript {
   gap: 8px;
   max-width: 78%;
 
-  &--theirs { align-self: flex-start; }
-  &--mine { align-self: flex-end; flex-direction: row-reverse; }
-  &--first { margin-top: 8px; }
+  &--theirs {
+    align-self: flex-start;
+  }
+
+  &--mine {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  &--first {
+    margin-top: 8px;
+  }
 
   &__avatar {
     flex: 0 0 34px;
     width: 34px;
     height: 34px;
 
-    img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; display: block; }
+    img {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
   }
 
   &__body {
@@ -11771,8 +11958,13 @@ noscript {
     min-width: 0;
   }
 
-  &--mine &__body { align-items: flex-end; }
-  &--theirs &__body { align-items: flex-start; }
+  &--mine &__body {
+    align-items: flex-end;
+  }
+
+  &--theirs &__body {
+    align-items: flex-start;
+  }
 
   &__name {
     font-size: 12px;
@@ -11786,25 +11978,55 @@ noscript {
     font-size: 15px;
     line-height: 1.4;
     border-radius: 20px;
-    word-break: break-word;
     overflow-wrap: anywhere;
   }
 
-  &--theirs &__bubble { background: var(--room-bubble-theirs); color: inherit; border-end-start-radius: 6px; }
-  &--mine &__bubble { background: var(--room-bubble-mine); color: var(--room-bubble-mine-text); border-end-end-radius: 6px; }
-
-  &--theirs.room-message--first &__bubble { border-start-start-radius: 20px; }
-  &--theirs:not(.room-message--last) &__bubble { border-end-start-radius: 6px; }
-  &--mine:not(.room-message--last) &__bubble { border-end-end-radius: 6px; }
-
-  &__content {
-    p { margin: 0; }
-    p + p { margin-top: 8px; }
-    a { color: inherit; text-decoration: underline; }
-    code { background: rgba(0, 0, 0, 20%); }
+  &--theirs &__bubble {
+    background: var(--room-bubble-theirs);
+    color: inherit;
+    border-end-start-radius: 6px;
   }
 
-  &--mine &__content .md-spoiler:not(.md-spoiler--revealed) { background: rgba(255, 255, 255, 90%); }
+  &--mine &__bubble {
+    background: var(--room-bubble-mine);
+    color: var(--room-bubble-mine-text);
+    border-end-end-radius: 6px;
+  }
+
+  &--theirs.room-message--first &__bubble {
+    border-start-start-radius: 20px;
+  }
+
+  &--theirs:not(.room-message--last) &__bubble {
+    border-end-start-radius: 6px;
+  }
+
+  &--mine:not(.room-message--last) &__bubble {
+    border-end-end-radius: 6px;
+  }
+
+  &__content {
+    p {
+      margin: 0;
+    }
+
+    p + p {
+      margin-top: 8px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: underline;
+    }
+
+    code {
+      background: rgba(0, 0, 0, 20%);
+    }
+  }
+
+  &--mine &__content .md-spoiler:not(.md-spoiler--revealed) {
+    background: rgba(255, 255, 255, 90%);
+  }
 
   &__media {
     display: grid;
@@ -11813,8 +12035,15 @@ noscript {
     overflow: hidden;
     max-width: 360px;
 
-    &--1 { grid-template-columns: 1fr; }
-    &--2, &--3, &--4 { grid-template-columns: 1fr 1fr; }
+    &--1 {
+      grid-template-columns: 1fr;
+    }
+
+    &--2,
+    &--3,
+    &--4 {
+      grid-template-columns: 1fr 1fr;
+    }
 
     button {
       border: 0;
@@ -11826,9 +12055,17 @@ noscript {
       overflow: hidden;
     }
 
-    &--1 button { aspect-ratio: auto; max-height: 380px; }
+    &--1 button {
+      aspect-ratio: auto;
+      max-height: 380px;
+    }
 
-    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
   }
 
   &__time {
@@ -11859,26 +12096,37 @@ noscript {
     opacity: 0;
     transition: opacity 0.15s;
 
-    .icon-button { color: var(--room-muted); }
+    .icon-button {
+      color: var(--room-muted);
+    }
 
     // While open, Dropdown renames the icon to `close`. Bird UI paints an X
     // background on `.icon-close`, which landed on top of our ⋯ svg. Keep just ⋯.
-    .icon-close { background-image: none !important; }
+    .icon-close {
+      background-image: none !important;
+    }
   }
 
   &:hover &__menu,
   &__menu:focus-within,
-  &__menu:has(.active) { opacity: 1; }
+  &__menu:has(.active) {
+    opacity: 1;
+  }
 
   @media (hover: none) {
-    &__menu { opacity: 0.6; }
+    &__menu {
+      opacity: 0.6;
+    }
   }
 
   &--editing {
     max-width: 90%;
     width: 90%;
   }
-  &--editing &__body { width: 100%; }
+
+  &--editing &__body {
+    width: 100%;
+  }
 
   &__editor {
     width: 100%;
@@ -11962,7 +12210,9 @@ noscript {
     padding: 4px 6px;
     border: 1px solid transparent;
 
-    &:focus-within { border-color: var(--room-bubble-mine); }
+    &:focus-within {
+      border-color: var(--room-bubble-mine);
+    }
   }
 
   &__textarea {
@@ -11980,7 +12230,9 @@ noscript {
     max-height: 160px;
     outline: none;
 
-    &::placeholder { opacity: 0.6; }
+    &::placeholder {
+      opacity: 0.6;
+    }
   }
 
   &__attach,
@@ -11997,9 +12249,20 @@ noscript {
     justify-content: center;
     cursor: pointer;
 
-    .icon { width: 22px; height: 22px; }
-    &:hover { background: rgba(29, 155, 240, 12%); }
-    &:disabled { opacity: 0.4; cursor: default; background: transparent; }
+    .icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    &:hover {
+      background: rgba(29, 155, 240, 12%);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: default;
+      background: transparent;
+    }
   }
 
   &__thumbs {
@@ -12017,12 +12280,20 @@ noscript {
     overflow: hidden;
     background: var(--room-bubble-theirs);
 
-    img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
 
     &--loading {
-      background:
-        var(--room-bubble-theirs)
-        repeating-linear-gradient(45deg, rgba(128, 128, 128, 15%) 0 8px, transparent 8px 16px);
+      background: var(--room-bubble-theirs)
+        repeating-linear-gradient(
+          45deg,
+          rgba(128, 128, 128, 15%) 0 8px,
+          transparent 8px 16px
+        );
     }
 
     &__remove {
@@ -12040,7 +12311,10 @@ noscript {
       color: #fff;
       cursor: pointer;
 
-      .icon { width: 14px; height: 14px; }
+      .icon {
+        width: 14px;
+        height: 14px;
+      }
     }
   }
 }
@@ -12396,13 +12670,23 @@ noscript {
   // !important is needed to beat Bird UI's `.ui__header__logo img { display: none }`
   // (it hides the inner image to paint a background instead). We do the opposite:
   // show exactly one <img> per color scheme and suppress the background.
-  .logo--custom-light { display: block !important; }
-  .logo--custom-dark { display: none !important; }
+  .logo--custom-light {
+    display: block !important;
+  }
+
+  .logo--custom-dark {
+    display: none !important;
+  }
 }
 
 [data-color-scheme='dark'] .logo--custom {
-  .logo--custom-light { display: none !important; }
-  .logo--custom-dark { display: block !important; }
+  .logo--custom-light {
+    display: none !important;
+  }
+
+  .logo--custom-dark {
+    display: block !important;
+  }
 }
 
 // momodo: scheduled statuses — compose clock dropdown + hint + list screen
@@ -12425,7 +12709,7 @@ noscript {
   font-size: 14px;
   padding: 6px 8px;
   border-radius: 4px;
-  border: 1px solid rgba(128, 128, 128, 0.4);
+  border: 1px solid rgba(128, 128, 128, 40%);
   background: transparent;
   color: inherit;
 }
@@ -12444,7 +12728,7 @@ noscript {
 .schedule-dropdown__preset,
 .schedule-dropdown__clear {
   appearance: none;
-  border: 1px solid rgba(128, 128, 128, 0.4);
+  border: 1px solid rgba(128, 128, 128, 40%);
   background: transparent;
   color: inherit;
   border-radius: 4px;
@@ -12454,12 +12738,12 @@ noscript {
 
   &:hover,
   &:focus {
-    background: rgba(128, 128, 128, 0.15);
+    background: rgba(128, 128, 128, 15%);
   }
 }
 
 .schedule-dropdown__clear {
-  border-color: rgba(220, 100, 100, 0.5);
+  border-color: rgba(220, 100, 100, 50%);
 }
 
 .scheduled-statuses__item {
@@ -12467,7 +12751,7 @@ noscript {
   flex-direction: column;
   gap: 6px;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--color-border, rgba(128, 128, 128, 0.2));
+  border-bottom: 1px solid var(--color-border, rgba(128, 128, 128, 20%));
 }
 
 .scheduled-statuses__item__time {
@@ -12480,7 +12764,7 @@ noscript {
 
   .scheduled-statuses__item__reply-chip {
     font-weight: 500;
-    border: 1px solid rgba(128, 128, 128, 0.4);
+    border: 1px solid rgba(128, 128, 128, 40%);
     border-radius: 10px;
     padding: 0 8px;
   }
@@ -12503,7 +12787,7 @@ noscript {
 
   button {
     appearance: none;
-    border: 1px solid rgba(128, 128, 128, 0.4);
+    border: 1px solid rgba(128, 128, 128, 40%);
     background: transparent;
     color: inherit;
     border-radius: 4px;
@@ -12513,11 +12797,11 @@ noscript {
 
     &:hover,
     &:focus {
-      background: rgba(128, 128, 128, 0.15);
+      background: rgba(128, 128, 128, 15%);
     }
 
     &.danger {
-      border-color: rgba(220, 100, 100, 0.5);
+      border-color: rgba(220, 100, 100, 50%);
     }
   }
 }

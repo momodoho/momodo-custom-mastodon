@@ -2,6 +2,9 @@ module.exports = {
   extends: ['stylelint-config-standard-scss'],
   ignoreFiles: [
     'app/javascript/styles/mastodon/reset.scss',
+    // momodo: vendored Bird UI theme (kept byte-for-byte for future updates)
+    'app/javascript/styles/mastodon-bird-ui/_bird-ui-dark.scss',
+    'app/javascript/styles/mastodon-bird-ui/_bird-ui-light.scss',
     'coverage/**/*',
     'node_modules/**/*',
     'public/assets/**/*',

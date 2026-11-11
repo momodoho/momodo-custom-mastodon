@@ -8,6 +8,9 @@ class Auth::SessionsController < Devise::SessionsController
   layout 'auth'
 
   skip_before_action :check_self_destruct!
+  # momodo: `new` comes from Devise; listing it here is intentional (multi-account
+  # "add account" sign-in screen while already signed in).
+  # rubocop:disable Rails/LexicallyScopedActionFilter
   skip_before_action :require_no_authentication, only: [:new, :create]
   skip_before_action :require_functional!
   skip_before_action :update_user_sign_in
@@ -16,6 +19,7 @@ class Auth::SessionsController < Devise::SessionsController
 
   prepend_before_action :check_suspicious!, only: [:create]
   before_action :require_no_authentication_unless_adding, only: [:new]
+  # rubocop:enable Rails/LexicallyScopedActionFilter
 
   include Auth::TwoFactorAuthenticationConcern
   include Auth::SignInTokenAuthenticationConcern

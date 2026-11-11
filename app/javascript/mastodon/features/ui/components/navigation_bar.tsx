@@ -162,9 +162,7 @@ export const NavigationBar: React.FC = () => {
   const { signedIn } = useIdentity();
   const dispatch = useAppDispatch();
   const open = useAppSelector((state) => state.navigation.open);
-  const hasUnreadRooms = useAppSelector(
-    (state) => state.room_unread.size > 0,
-  );
+  const hasUnreadRooms = useAppSelector((state) => state.room_unread.size > 0);
   const intl = useIntl();
 
   const handleClick = useCallback(() => {

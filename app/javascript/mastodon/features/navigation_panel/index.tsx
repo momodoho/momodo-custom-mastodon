@@ -16,16 +16,16 @@ import BookmarksActiveIcon from '@/material-icons/400-24px/bookmarks-fill.svg?re
 import BookmarksIcon from '@/material-icons/400-24px/bookmarks.svg?react';
 import GroupsActiveIcon from '@/material-icons/400-24px/groups-fill.svg?react';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
-import ScheduleIcon from '@/material-icons/400-24px/schedule.svg?react';
-import MarkEmailUnreadIcon from '@/material-icons/400-24px/mark_email_unread.svg?react';
 import HomeActiveIcon from '@/material-icons/400-24px/home-fill.svg?react';
 import HomeIcon from '@/material-icons/400-24px/home.svg?react';
 import InfoIcon from '@/material-icons/400-24px/info.svg?react';
+import MarkEmailUnreadIcon from '@/material-icons/400-24px/mark_email_unread.svg?react';
 import NotificationsActiveIcon from '@/material-icons/400-24px/notifications-fill.svg?react';
 import NotificationsIcon from '@/material-icons/400-24px/notifications.svg?react';
 import PersonAddActiveIcon from '@/material-icons/400-24px/person_add-fill.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
 import PublicIcon from '@/material-icons/400-24px/public.svg?react';
+import ScheduleIcon from '@/material-icons/400-24px/schedule.svg?react';
 import SettingsIcon from '@/material-icons/400-24px/settings.svg?react';
 import StarActiveIcon from '@/material-icons/400-24px/star-fill.svg?react';
 import StarIcon from '@/material-icons/400-24px/star.svg?react';
@@ -79,8 +79,14 @@ const messages = defineMessages({
   },
   direct: { id: 'navigation_bar.direct', defaultMessage: 'Private mentions' },
   rooms: { id: 'navigation_bar.rooms', defaultMessage: 'Rooms' },
-  scheduledStatuses: { id: 'navigation_bar.scheduled_statuses', defaultMessage: 'Scheduled posts' },
-  unrepliedMentions: { id: 'navigation_bar.unreplied_mentions', defaultMessage: 'Unreplied messages' },
+  scheduledStatuses: {
+    id: 'navigation_bar.scheduled_statuses',
+    defaultMessage: 'Scheduled posts',
+  },
+  unrepliedMentions: {
+    id: 'navigation_bar.unreplied_mentions',
+    defaultMessage: 'Unreplied messages',
+  },
   favourites: { id: 'navigation_bar.favourites', defaultMessage: 'Favorites' },
   bookmarks: { id: 'navigation_bar.bookmarks', defaultMessage: 'Bookmarks' },
   collections: {

@@ -22,6 +22,14 @@
     // Vendored CSS
     "app/javascript/styles/mastodon/reset.scss",
 
+    // momodo: private docs (not mirrored) and the vendored Bird UI theme —
+    // reformatting Bird UI would only make future Bird UI updates harder to diff.
+    "README.md",
+    "UPGRADING.md",
+    "app/javascript/styles/mastodon-bird-ui/_bird-ui-dark.scss",
+    "app/javascript/styles/mastodon-bird-ui/_bird-ui-light.scss",
+    "app/javascript/styles/mastodon-bird-ui/_bird-ui-light-vars.scss",
+
     // Automatically generated
     "/app/javascript/mastodon/features/emoji/emoji_map.json",
     "/app/javascript/mastodon/features/emoji/emoji_data.json",

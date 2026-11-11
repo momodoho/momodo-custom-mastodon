@@ -15,10 +15,7 @@ import { closeOnboarding } from 'mastodon/actions/onboarding';
 import { Button } from 'mastodon/components/button';
 import { Column } from 'mastodon/components/column';
 import { ColumnHeader } from 'mastodon/components/column_header';
-import {
-  TextAreaField,
-  TextInputField,
-} from 'mastodon/components/form_fields';
+import { TextAreaField, TextInputField } from 'mastodon/components/form_fields';
 import { Icon } from 'mastodon/components/icon';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
 import { me } from 'mastodon/initial_state';
@@ -86,7 +83,6 @@ export const Profile: React.FC<{
     },
     [setNote],
   );
-
 
   const handleAvatarChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

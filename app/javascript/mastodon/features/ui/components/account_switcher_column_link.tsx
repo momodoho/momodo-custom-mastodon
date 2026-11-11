@@ -8,7 +8,10 @@ import { ColumnLink } from 'mastodon/features/ui/components/column_link';
 import { useAppDispatch } from 'mastodon/store';
 
 const messages = defineMessages({
-  text: { id: 'navigation_bar.account_switcher', defaultMessage: 'Switch account' },
+  text: {
+    id: 'navigation_bar.account_switcher',
+    defaultMessage: 'Switch account',
+  },
 });
 
 export const AccountSwitcherColumnLink: React.FC = () => {
