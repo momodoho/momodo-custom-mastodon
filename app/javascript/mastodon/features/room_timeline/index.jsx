@@ -12,6 +12,7 @@ import { connect } from 'react-redux';
 import { injectIntl } from '@/mastodon/components/intl';
 import ArrowBackIcon from '@/material-icons/400-24px/arrow_back.svg?react';
 import CampaignIcon from '@/material-icons/400-24px/campaign.svg?react';
+import EditIcon from '@/material-icons/400-24px/edit.svg?react';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
@@ -44,6 +45,7 @@ const messages = defineMessages({
   members: { id: 'rooms.members.title', defaultMessage: 'Members' },
   destroy: { id: 'rooms.destroy.action', defaultMessage: 'Leave and delete room' },
   pins: { id: 'rooms.pins.title', defaultMessage: 'Group notices' },
+  rename: { id: 'rooms.rename.title', defaultMessage: 'Rename room' },
 });
 
 const mapStateToProps = (state, props) => ({
@@ -73,6 +75,14 @@ class RoomTimeline extends PureComponent {
     const { id } = this.props.params;
 
     dispatch(openModal({ modalType: 'ROOM_MEMBERS', modalProps: { roomId: id } }));
+  };
+
+  // momodo: owner-only rename
+  handleRename = () => {
+    const { dispatch } = this.props;
+    const { id } = this.props.params;
+
+    dispatch(openModal({ modalType: 'ROOM_RENAME', modalProps: { roomId: id } }));
   };
 
   // momodo: 그룹 공지 popup
@@ -268,6 +278,17 @@ class RoomTimeline extends PureComponent {
                   onClick={this.handleShowPins}
                 >
                   <Icon id='bullhorn' icon={CampaignIcon} />
+                </button>
+              )}
+              {isOwner && (
+                <button
+                  type='button'
+                  className='room-pane__action'
+                  title={intl.formatMessage(messages.rename)}
+                  aria-label={intl.formatMessage(messages.rename)}
+                  onClick={this.handleRename}
+                >
+                  <Icon id='pencil' icon={EditIcon} />
                 </button>
               )}
               {isOwner && (

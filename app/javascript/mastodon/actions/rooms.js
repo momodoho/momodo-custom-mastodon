@@ -32,6 +32,20 @@ export const fetchRoom = id => (dispatch, getState) => {
     .catch(err => dispatch(roomFetchFail(id, err)));
 };
 
+// momodo: fetchRoom skips rooms already in the store; this one always asks the
+// server (used when the room stream says the room changed, e.g. renamed).
+export const refreshRoom = id => (dispatch) =>
+  api().get(`/api/v1/rooms/${id}`)
+    .then(({ data }) => dispatch(roomFetchSuccess(data)))
+    .catch(() => undefined);
+
+// momodo: owner-only rename. The server trims the name and tells the other
+// members over the room stream.
+export const renameRoom = (id, title) => (dispatch) =>
+  api().put(`/api/v1/rooms/${id}`, { title })
+    .then(({ data }) => { dispatch(roomFetchSuccess(data)); return data; })
+    .catch((error) => { dispatch(showAlertForError(error)); throw error; });
+
 // momodo: rooms are always invite-only (server forces join_policy=invite).
 export const createRoom = title => (dispatch) =>
   api().post('/api/v1/rooms', { title })

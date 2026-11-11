@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Api::V1::RoomsController < Api::BaseController
+  include Redisable
+
   before_action -> { doorkeeper_authorize! :read }, only: [:index, :show, :unread]
   before_action -> { doorkeeper_authorize! :write }, except: [:index, :show, :unread]
 
@@ -28,9 +30,13 @@ class Api::V1::RoomsController < Api::BaseController
     render json: @room, serializer: REST::RoomSerializer
   end
 
+  # momodo: only the owner (who made the room) may rename it. Members with the
+  # room open get a `room.update` event and refetch, so the new name shows up
+  # in their header and room list right away.
   def update
     authorize_owner!
-    @room.update!(room_params)
+    @room.update!(title: room_params[:title].to_s.strip)
+    broadcast_room_update! if @room.saved_change_to_title?
     render json: @room, serializer: REST::RoomSerializer
   end
 
@@ -84,6 +90,10 @@ class Api::V1::RoomsController < Api::BaseController
 
   def set_room
     @room = Room.lookup_by_token!(params[:id])
+  end
+
+  def broadcast_room_update!
+    redis.publish("timeline:room:#{@room.token}", { event: :'room.update', payload: @room.token }.to_json)
   end
 
   def authorize_owner!

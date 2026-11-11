@@ -1271,6 +1271,8 @@
   "rooms.placeholder.title": "대화 시작하기",
   "rooms.policy.invite": "초대만 가능",
   "rooms.policy.open": "누구나 참여 가능",
+  "rooms.rename.save": "저장",
+  "rooms.rename.title": "방 이름 변경",
   "rooms.search": "검색",
   "rooms.snippet.image": "사진을 보냈습니다",
   "rooms.title_placeholder": "새 그룹 이름",

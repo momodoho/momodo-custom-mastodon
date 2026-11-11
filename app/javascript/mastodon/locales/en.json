@@ -1259,6 +1259,8 @@
   "rooms.pins.unpin": "Unpin",
   "rooms.placeholder.body": "Pick an existing chat or create a new one.",
   "rooms.placeholder.title": "Start a conversation",
+  "rooms.rename.save": "Save",
+  "rooms.rename.title": "Rename room",
   "rooms.search": "Search",
   "rooms.snippet.image": "Sent an image",
   "rooms.title_placeholder": "New room name",

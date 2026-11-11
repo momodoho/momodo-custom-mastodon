@@ -96,6 +96,7 @@ export const MODAL_COMPONENTS = {
   'COMPOSE_PRIVACY': () => Promise.resolve({ default: VisibilityModal }),
   // momodo: room member list (any member can open it from the room header)
   'ROOM_MEMBERS': () => import('@/mastodon/features/room_timeline/components/room_members_modal').then(module => ({ default: module.RoomMembersModal })),
+  'ROOM_RENAME': () => import('@/mastodon/features/room_timeline/components/room_rename_modal').then(module => ({ default: module.RoomRenameModal })),
   'ROOM_PINS': () => import('@/mastodon/features/room_timeline/components/room_pins_modal').then(module => ({ default: module.RoomPinsModal })),
   // momodo: Twitter-style reply recipient picker
   'REPLY_MENTIONS': () => import('@/mastodon/features/ui/components/reply_mentions_modal').then(module => ({ default: module.ReplyMentionsModal })),
