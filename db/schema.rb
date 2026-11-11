@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1105,6 +1105,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
     t.index ["room_id"], name: "index_room_memberships_on_room_id"
   end
 
+  create_table "room_pins", force: :cascade do |t|
+    t.bigint "account_id"
+    t.datetime "created_at", null: false
+    t.bigint "room_id", null: false
+    t.bigint "status_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_room_pins_on_account_id"
+    t.index ["room_id", "status_id"], name: "index_room_pins_on_room_id_and_status_id", unique: true
+    t.index ["status_id"], name: "index_room_pins_on_status_id"
+  end
+
   create_table "rooms", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.datetime "created_at", null: false
@@ -1627,6 +1638,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
   add_foreign_key "reports", "oauth_applications", column: "application_id", on_delete: :nullify
   add_foreign_key "room_memberships", "accounts", on_delete: :cascade
   add_foreign_key "room_memberships", "rooms", on_delete: :cascade
+  add_foreign_key "room_pins", "accounts", on_delete: :nullify
+  add_foreign_key "room_pins", "rooms", on_delete: :cascade
+  add_foreign_key "room_pins", "statuses", on_delete: :cascade
   add_foreign_key "rooms", "accounts", on_delete: :cascade
   add_foreign_key "rule_translations", "rules", on_delete: :cascade
   add_foreign_key "scheduled_statuses", "accounts", on_delete: :cascade

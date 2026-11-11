@@ -11,11 +11,12 @@ import { connect } from 'react-redux';
 
 import { injectIntl } from '@/mastodon/components/intl';
 import ArrowBackIcon from '@/material-icons/400-24px/arrow_back.svg?react';
+import CampaignIcon from '@/material-icons/400-24px/campaign.svg?react';
 import GroupsIcon from '@/material-icons/400-24px/groups.svg?react';
 import LogoutIcon from '@/material-icons/400-24px/logout.svg?react';
 import PersonAddIcon from '@/material-icons/400-24px/person_add.svg?react';
 import { openModal } from 'mastodon/actions/modal';
-import { fetchRoom, fetchRooms, leaveRoom, destroyRoom, markRoomRead } from 'mastodon/actions/rooms';
+import { fetchRoom, fetchRoomPins, fetchRooms, leaveRoom, destroyRoom, markRoomRead } from 'mastodon/actions/rooms';
 import { Icon } from 'mastodon/components/icon';
 import { connectRoomStream } from 'mastodon/actions/streaming';
 import { expandRoomTimeline } from 'mastodon/actions/timelines';
@@ -27,6 +28,7 @@ import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
 import { RoomChat } from './components/room_chat';
 import { RoomComposer } from './components/room_composer';
+import { RoomPinsBanner } from './components/room_pins_banner';
 
 const messages = defineMessages({
   leaveTitle: { id: 'rooms.leave.title', defaultMessage: 'Leave room' },
@@ -41,6 +43,7 @@ const messages = defineMessages({
   leave: { id: 'rooms.leave.action', defaultMessage: 'Leave room' },
   members: { id: 'rooms.members.title', defaultMessage: 'Members' },
   destroy: { id: 'rooms.destroy.action', defaultMessage: 'Leave and delete room' },
+  pins: { id: 'rooms.pins.title', defaultMessage: 'Group notices' },
 });
 
 const mapStateToProps = (state, props) => ({
@@ -70,6 +73,14 @@ class RoomTimeline extends PureComponent {
     const { id } = this.props.params;
 
     dispatch(openModal({ modalType: 'ROOM_MEMBERS', modalProps: { roomId: id } }));
+  };
+
+  // momodo: 그룹 공지 popup
+  handleShowPins = () => {
+    const { dispatch } = this.props;
+    const { id } = this.props.params;
+
+    dispatch(openModal({ modalType: 'ROOM_PINS', modalProps: { roomId: id } }));
   };
 
   handleLeave = () => {
@@ -105,6 +116,7 @@ class RoomTimeline extends PureComponent {
 
     dispatch(fetchRoom(id));
     dispatch(expandRoomTimeline(id));
+    dispatch(fetchRoomPins(id));
 
     this.disconnect = dispatch(connectRoomStream(id));
 
@@ -152,6 +164,7 @@ class RoomTimeline extends PureComponent {
 
       dispatch(fetchRoom(id));
       dispatch(expandRoomTimeline(id));
+      dispatch(fetchRoomPins(id));
 
       this.disconnect = dispatch(connectRoomStream(id));
 
@@ -246,6 +259,17 @@ class RoomTimeline extends PureComponent {
             </div>
 
             <div className='room-pane__actions'>
+              {isMember && (
+                <button
+                  type='button'
+                  className='room-pane__action'
+                  title={intl.formatMessage(messages.pins)}
+                  aria-label={intl.formatMessage(messages.pins)}
+                  onClick={this.handleShowPins}
+                >
+                  <Icon id='bullhorn' icon={CampaignIcon} />
+                </button>
+              )}
               {isOwner && (
                 <Link to={`/rooms/${id}/members`} className='room-pane__action' title={intl.formatMessage(messages.manage)} aria-label={intl.formatMessage(messages.manage)}>
                   <Icon id='user-plus' icon={PersonAddIcon} />
@@ -265,7 +289,9 @@ class RoomTimeline extends PureComponent {
             </div>
           </header>
 
-          <RoomChat roomId={id} onLoadMore={this.handleLoadMore} />
+          {isMember && <RoomPinsBanner roomId={id} onOpen={this.handleShowPins} />}
+
+          <RoomChat roomId={id} onLoadMore={this.handleLoadMore} canPin={!!isMember} />
 
           {isMember && <RoomComposer roomId={id} />}
         </div>

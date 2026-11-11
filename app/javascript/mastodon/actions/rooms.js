@@ -1,6 +1,7 @@
 import api from '../api';
 
-import { importFetchedStatus } from './importer';
+import { showAlertForError } from './alerts';
+import { importFetchedAccounts, importFetchedStatus, importFetchedStatuses } from './importer';
 import { updateTimeline, clearTimeline } from './timelines';
 
 export const ROOMS_FETCH_SUCCESS = 'ROOMS_FETCH_SUCCESS';
@@ -9,6 +10,8 @@ export const ROOM_FETCH_FAIL     = 'ROOM_FETCH_FAIL';
 export const ROOM_DESTROYED      = 'ROOM_DESTROYED';
 export const ROOMS_UNREAD_SET    = 'ROOMS_UNREAD_SET';
 export const ROOM_MARK_READ      = 'ROOM_MARK_READ';
+export const ROOM_PINS_SET       = 'ROOM_PINS_SET';
+export const ROOM_PIN_REMOVED    = 'ROOM_PIN_REMOVED';
 
 const roomFetchSuccess = room => ({ type: ROOM_FETCH_SUCCESS, room });
 const roomsFetchSuccess = rooms => ({ type: ROOMS_FETCH_SUCCESS, rooms });
@@ -91,4 +94,41 @@ export const fetchRoomsUnread = () => (dispatch) =>
 export const markRoomRead = id => (dispatch) => {
   dispatch({ type: ROOM_MARK_READ, id: String(id) });
   return api().post(`/api/v1/rooms/${id}/read`).catch(() => undefined);
+};
+
+// momodo: "그룹 공지" — messages pinned to the top of a room. The store keeps
+// only { id, pinned_at, pinned_by_id } per room; the statuses and pinners go
+// through the normal importers so edits/deletes elsewhere show up here too.
+const importPins = (dispatch, pins) => {
+  dispatch(importFetchedStatuses(pins.map((pin) => pin.status)));
+  dispatch(importFetchedAccounts(pins.map((pin) => pin.pinned_by).filter(Boolean)));
+};
+
+const pinEntry = (pin) => ({
+  id: pin.id,
+  pinned_at: pin.pinned_at,
+  pinned_by_id: pin.pinned_by ? pin.pinned_by.id : null,
+});
+
+export const fetchRoomPins = id => (dispatch) =>
+  api().get(`/api/v1/rooms/${id}/pins`)
+    .then(({ data }) => {
+      importPins(dispatch, data);
+      dispatch({ type: ROOM_PINS_SET, id: String(id), pins: data.map(pinEntry) });
+      return data;
+    })
+    .catch(() => undefined);
+
+export const pinRoomStatus = (id, statusId) => (dispatch) =>
+  api().post(`/api/v1/rooms/${id}/pins`, { status_id: statusId })
+    .then(() => dispatch(fetchRoomPins(id)))
+    .catch((error) => dispatch(showAlertForError(error)));
+
+export const unpinRoomStatus = (id, statusId) => (dispatch) => {
+  dispatch({ type: ROOM_PIN_REMOVED, id: String(id), statusId: String(statusId) });
+  return api().delete(`/api/v1/rooms/${id}/pins/${statusId}`)
+    .catch((error) => {
+      dispatch(showAlertForError(error));
+      dispatch(fetchRoomPins(id));
+    });
 };

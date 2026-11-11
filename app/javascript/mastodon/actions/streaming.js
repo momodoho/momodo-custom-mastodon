@@ -12,7 +12,7 @@ import {
 import { updateConversations } from './conversations';
 import { processNewNotificationForGroups, refreshStaleNotificationGroups, pollRecentNotifications as pollRecentGroupNotifications } from './notification_groups';
 import { updateNotifications } from './notifications';
-import { roomDestroyed } from './rooms';
+import { fetchRoomPins, roomDestroyed } from './rooms';
 import { updateStatus } from './statuses';
 import {
   updateTimeline,
@@ -114,6 +114,10 @@ export const connectTimelineStream = (timelineId, channelName, params = {}, opti
         // room (and everything in it) is gone for every member.
         case 'room.destroyed':
           dispatch(roomDestroyed(data.payload));
+          break;
+        // momodo: someone pinned/unpinned a 그룹 공지 — refetch the short list.
+        case 'room.pins':
+          dispatch(fetchRoomPins(data.payload));
           break;
         case 'notification': {
           // @ts-expect-error

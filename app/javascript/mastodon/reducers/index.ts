@@ -21,6 +21,7 @@ import media_attachments from './media_attachments';
 import meta from './meta';
 import { modalReducer } from './modal';
 import { navigationReducer } from './navigation';
+import roomPins from './room_pins';
 import roomUnread from './room_unread';
 import rooms from './rooms';
 import { notificationGroupsReducer } from './notification_groups';
@@ -71,6 +72,7 @@ const reducers = {
   lists: listsReducer,
   rooms,
   room_unread: roomUnread, // momodo: group-message unread badge
+  room_pins: roomPins, // momodo: 그룹 공지
   followedTags: followedTagsReducer,
   filters,
   conversations,

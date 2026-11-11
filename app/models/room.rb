@@ -40,6 +40,8 @@ class Room < ApplicationRecord
   # on its author's own profile. Bulk destruction goes through
   # DestroyRoomService / RoomDestroyWorker; this is the safety net.
   has_many :statuses, inverse_of: :room, dependent: :destroy
+  # momodo: "그룹 공지" — pinned messages (FK cascades with the room/status too)
+  has_many :pins, class_name: 'RoomPin', inverse_of: :room, dependent: :delete_all
 
   validates :title, presence: true, length: { maximum: TITLE_LENGTH_LIMIT }
   validates :token, presence: true, uniqueness: true

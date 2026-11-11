@@ -2086,6 +2086,8 @@ en:
       images_only: Only images can be attached in group messages.
       no_scheduling: Room posts cannot be scheduled.
       not_a_member: You are not a member of this room.
+    pins:
+      limit_reached: A room can have at most %{count} notices. Unpin an older one and try again.
     snippet:
       image:
         one: Sent an image

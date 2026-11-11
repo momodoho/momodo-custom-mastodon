@@ -274,6 +274,7 @@ namespace :api, format: false do
         post :read # momodo: mark room read
       end
       resource :accounts, only: [:show, :create, :destroy], module: :rooms
+      resources :pins, only: [:index, :create, :destroy], module: :rooms # momodo: 그룹 공지
     end
 
     namespace :featured_tags do

@@ -9,11 +9,15 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import MoreHorizIcon from '@/material-icons/400-24px/more_horiz.svg?react';
+import PushPinIcon from '@/material-icons/400-24px/push_pin-fill.svg?react';
 import { openModal } from 'mastodon/actions/modal';
-import { editRoomStatus, fetchRoomStatusSource } from 'mastodon/actions/rooms';
+import { editRoomStatus, fetchRoomStatusSource, pinRoomStatus, unpinRoomStatus } from 'mastodon/actions/rooms';
 import { Dropdown } from 'mastodon/components/dropdown_menu';
+import { Icon } from 'mastodon/components/icon';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
 import { me } from 'mastodon/initial_state';
+
+import { canUnpin } from './room_pins_modal';
 
 const GROUP_WINDOW_MS = 5 * 60 * 1000;
 
@@ -25,25 +29,48 @@ const messages = defineMessages({
   save: { id: 'room.message.save', defaultMessage: 'Save' },
   cancel: { id: 'room.message.cancel', defaultMessage: 'Cancel' },
   editHint: { id: 'room.message.edit_hint', defaultMessage: 'Enter to save · Esc to cancel' },
+  pin: { id: 'rooms.pins.pin', defaultMessage: 'Pin as notice' },
+  unpin: { id: 'rooms.pins.unpin', defaultMessage: 'Unpin' },
+  pinned: { id: 'rooms.pins.badge', defaultMessage: 'Notice' },
 });
 
-// momodo: ⋯ menu beside my own message — edit / delete. Only my messages get it
-// (the server would refuse anyway: edit and delete are author-only).
-const MessageMenu = ({ status, onEdit }) => {
+// momodo: ⋯ menu beside a message. Mine: edit / delete (author-only on the
+// server too). Anyone's: pin as 그룹 공지, or take the notice down when allowed.
+const MessageMenu = ({ roomId, room, status, mine, pin, canPin, onEdit }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
 
-  const items = useMemo(() => [
-    { text: intl.formatMessage(messages.edit), action: () => onEdit(status) },
-    {
-      text: intl.formatMessage(messages.delete),
-      dangerous: true,
-      action: () => dispatch(openModal({
-        modalType: 'CONFIRM_DELETE_STATUS',
-        modalProps: { statusId: status.get('id'), withRedraft: false },
-      })),
-    },
-  ], [intl, dispatch, status, onEdit]);
+  const items = useMemo(() => {
+    const out = [];
+
+    if (canPin && !pin) {
+      out.push({ text: intl.formatMessage(messages.pin), action: () => dispatch(pinRoomStatus(roomId, status.get('id'))) });
+    } else if (pin && canUnpin(pin, status, room)) {
+      out.push({ text: intl.formatMessage(messages.unpin), action: () => dispatch(unpinRoomStatus(roomId, status.get('id'))) });
+    }
+
+    if (mine) {
+      if (out.length > 0) {
+        out.push(null);
+      }
+
+      out.push({ text: intl.formatMessage(messages.edit), action: () => onEdit(status) });
+      out.push({
+        text: intl.formatMessage(messages.delete),
+        dangerous: true,
+        action: () => dispatch(openModal({
+          modalType: 'CONFIRM_DELETE_STATUS',
+          modalProps: { statusId: status.get('id'), withRedraft: false },
+        })),
+      });
+    }
+
+    return out;
+  }, [intl, dispatch, roomId, room, status, mine, pin, canPin, onEdit]);
+
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <div className='room-message__menu'>
@@ -59,7 +86,12 @@ const MessageMenu = ({ status, onEdit }) => {
 };
 
 MessageMenu.propTypes = {
+  roomId: PropTypes.string.isRequired,
+  room: PropTypes.object,
   status: PropTypes.object.isRequired,
+  mine: PropTypes.bool,
+  pin: PropTypes.object,
+  canPin: PropTypes.bool,
   onEdit: PropTypes.func.isRequired,
 };
 
@@ -169,7 +201,7 @@ const sameDay = (a, b) =>
 // timeline newest-first; we lay it out with `flex-direction: column-reverse`
 // so the newest message sits at the bottom and the scroll position is
 // naturally anchored there (new messages don't jump the view).
-export const RoomChat = ({ roomId, onLoadMore }) => {
+export const RoomChat = ({ roomId, onLoadMore, canPin }) => {
   const intl = useIntl();
   const dispatch = useDispatch();
   const scrollRef = useRef(null);
@@ -177,6 +209,17 @@ export const RoomChat = ({ roomId, onLoadMore }) => {
   const timeline = useSelector((state) => state.getIn(['timelines', `room:${roomId}`]));
   const statuses = useSelector((state) => state.get('statuses'));
   const accounts = useSelector((state) => state.get('accounts'));
+  const room = useSelector((state) => state.getIn(['rooms', roomId]));
+  const roomPins = useSelector((state) => state.getIn(['room_pins', roomId]));
+
+  // status id → pin entry, for the 공지 marker and the ⋯ menu
+  const pinsById = useMemo(() => {
+    const map = new Map();
+    if (roomPins) {
+      roomPins.forEach((pin) => map.set(pin.get('id'), pin));
+    }
+    return map;
+  }, [roomPins]);
 
   const items = timeline ? timeline.get('items') : null;
   const isLoading = timeline ? timeline.get('isLoading') : true;
@@ -312,6 +355,7 @@ export const RoomChat = ({ roomId, onLoadMore }) => {
         const hasText = html.replace(/<[^>]+>/g, '').trim().length > 0;
         const isEditing = editing && editing.id === status.get('id');
         const edited = !!status.get('edited_at');
+        const pin = pinsById.get(status.get('id'));
 
         return (
           <div
@@ -322,6 +366,7 @@ export const RoomChat = ({ roomId, onLoadMore }) => {
               'room-message--first': first,
               'room-message--last': last,
               'room-message--editing': isEditing,
+              'room-message--pinned': !!pin,
             })}
           >
 
@@ -368,8 +413,15 @@ export const RoomChat = ({ roomId, onLoadMore }) => {
                 </div>
               )}
 
-              {!isEditing && (last || edited) && (
+              {!isEditing && (last || edited || pin) && (
                 <div className='room-message__time'>
+                  {pin && (
+                    <span className='room-message__pinned'>
+                      <Icon id='thumb-tack' icon={PushPinIcon} />
+                      {intl.formatMessage(messages.pinned)}
+                    </span>
+                  )}
+                  {pin && (edited || last) && ' · '}
                   {edited && <span className='room-message__edited'>{intl.formatMessage(messages.edited)}</span>}
                   {edited && last && ' · '}
                   {last && intl.formatTime(new Date(status.get('created_at')), { hour: 'numeric', minute: '2-digit' })}
@@ -378,7 +430,9 @@ export const RoomChat = ({ roomId, onLoadMore }) => {
             </div>
 
             {/* After the body in DOM order: --mine rows are row-reverse, so this lands left of the bubble. */}
-            {mine && !isEditing && <MessageMenu status={status} onEdit={handleEdit} />}
+            {!isEditing && (
+              <MessageMenu roomId={roomId} room={room} status={status} mine={mine} pin={pin} canPin={canPin} onEdit={handleEdit} />
+            )}
           </div>
         );
       })}
@@ -391,4 +445,5 @@ export const RoomChat = ({ roomId, onLoadMore }) => {
 RoomChat.propTypes = {
   roomId: PropTypes.string.isRequired,
   onLoadMore: PropTypes.func.isRequired,
+  canPin: PropTypes.bool,
 };

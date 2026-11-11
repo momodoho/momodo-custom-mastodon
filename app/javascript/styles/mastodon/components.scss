@@ -11837,7 +11837,21 @@ noscript {
     margin: 2px 4px 0;
   }
 
-  // momodo: ⋯ (edit / delete) on my own messages — shows on hover/focus, always
+  // momodo: 그룹 공지 marker under a pinned message
+  &__pinned {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--room-bubble-mine);
+    font-weight: 600;
+
+    .icon {
+      width: 13px;
+      height: 13px;
+    }
+  }
+
+  // momodo: ⋯ (pin / edit / delete) beside a message — shows on hover/focus, always
   // visible (faint) on touch screens where there is no hover.
   &__menu {
     align-self: center;
@@ -12085,6 +12099,197 @@ noscript {
     align-items: center;
     gap: 6px;
     border-radius: 999px;
+  }
+}
+
+// momodo: 그룹 공지 — the one-line strip under the room header and the popup.
+.room-pins-banner {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 9px 16px;
+  border: 0;
+  border-bottom: 1px solid var(--room-border);
+  background: var(--room-input-bg);
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--room-hover);
+  }
+
+  &__icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    color: var(--room-bubble-mine);
+  }
+
+  &__label {
+    flex: 0 0 auto;
+    font-weight: 700;
+  }
+
+  &__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__count {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--room-muted);
+  }
+
+  &__chevron {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    color: var(--room-muted);
+  }
+}
+
+.room-pins-modal {
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px 16px;
+    max-height: 60vh;
+    overflow-y: auto;
+
+    &--refreshing {
+      opacity: 0.7;
+    }
+  }
+
+  &__item {
+    border: 1px solid var(--color-border-primary, rgba(128, 128, 128, 25%));
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+
+      time {
+        margin-inline-start: auto;
+        flex: 0 0 auto;
+      }
+    }
+
+    &__author {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      color: var(--color-text-primary);
+      font-weight: 700;
+      text-decoration: none;
+
+      bdi {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &:hover bdi {
+        text-decoration: underline;
+      }
+    }
+
+    &__content {
+      font-size: 15px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    &__media {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      button {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        width: 88px;
+        height: 88px;
+        border-radius: 10px;
+        overflow: hidden;
+        cursor: zoom-in;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+
+      span {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+    }
+
+    &__unpin {
+      flex: 0 0 auto;
+      border: 1px solid var(--color-border-primary, rgba(128, 128, 128, 35%));
+      background: transparent;
+      color: inherit;
+      border-radius: 999px;
+      padding: 3px 12px;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover,
+      &:focus-visible {
+        color: #f4212e;
+        border-color: #f4212e;
+      }
+    }
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--color-text-secondary);
+
+    .icon {
+      width: 32px;
+      height: 32px;
+    }
   }
 }
 
